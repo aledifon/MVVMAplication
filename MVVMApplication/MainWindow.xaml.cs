@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using MVVMApplication.ViewModel;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +20,8 @@ namespace MVVMApplication
         public MainWindow()
         {
             InitializeComponent();
+            MainWindowViewModel vm = new MainWindowViewModel();
+            DataContext = vm;
         }
     }
 }
