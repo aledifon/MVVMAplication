@@ -19,9 +19,8 @@ namespace MVVMApplication
     {
         public MainWindow()
         {
-            InitializeComponent();
-            MainWindowViewModel vm = new MainWindowViewModel();
-            DataContext = vm;
+            InitializeComponent();            
+            DataContext = new MainWindowViewModel();
         }
     }
 }
