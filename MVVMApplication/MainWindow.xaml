@@ -8,30 +8,33 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="800">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="441*"/>
+            <ColumnDefinition Width="359*"/>
+        </Grid.ColumnDefinitions>
         <!--Main Rows Definition-->
         <Grid.RowDefinitions>
             <RowDefinition Height="10*"/>
             <RowDefinition Height="20*"/>
             <RowDefinition Height="70*"/>
         </Grid.RowDefinitions>
-        
+
         <!--Commands Butttons-->
         <StackPanel             
             Orientation="Horizontal" 
-            HorizontalAlignment="Center">
+            HorizontalAlignment="Left" Grid.ColumnSpan="2" Margin="280,0,0,0">
             <!--d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=True}"-->
-            <Button Content="Get Clients" Width="75" Height="30" Margin="0,0,5,0"
+            <Button Content="Show Clients" Width="75" Height="30" Margin="0,0,5,0"
                     Command="{Binding GetAllClientsCommand}"/>
-            <Button Content="Get Orders" Width="75" Height="30" Margin="0,0,5,0"
+            <Button Content="Show Orders" Width="75" Height="30" Margin="0,0,5,0"
                     Command="{Binding GetAllOrdersCommand}"/>
-            <Button Content="Get Articles" Width="75" Height="30" Margin="0,0,5,0"
+            <Button Content="Show Articles" Width="75" Height="30" Margin="0,0,5,0"
                     Command="{Binding GetAllArticlesCommand}"/>
         </StackPanel>
 
         <!--Global Grid-->
         <Grid 
-            Grid.Row="1" 
-            Grid.RowSpan="2">
+            Grid.RowSpan="3" Grid.ColumnSpan="2" Margin="0,78,0,0">
             <!--d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=True}">-->
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="7*"/>
@@ -65,7 +68,7 @@
                             <DataGridTextColumn Header="Date Order" Binding="{Binding DateOrder}"/>
                             <DataGridTextColumn Header="Type of Payment" Binding="{Binding TypePayment}"/>
                         </DataGrid.Columns>
-                    </DataGrid>                     
+                    </DataGrid>
                 </TabItem>
                 <TabItem Header="Articles">
                     <DataGrid 
@@ -79,7 +82,7 @@
                             <DataGridTextColumn Header="Date" Binding="{Binding Date}"/>
                             <DataGridTextColumn Header="Origin Country" Binding="{Binding OriginCountry}"/>
                         </DataGrid.Columns>
-                    </DataGrid>                     
+                    </DataGrid>
                 </TabItem>
             </TabControl>
 
@@ -90,40 +93,71 @@
                     <RowDefinition Height="25*"/>
                     <RowDefinition Height="40*"/>
                 </Grid.RowDefinitions>
-                
-                <StackPanel>
-                    <Label Content="Client Data" FontWeight="Bold"/>
-                    <Label Content="Client Name"/>
-                    <TextBox Margin="5,0,5,0" Text="{Binding SelectedClient.ClientName, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Label Content="Address"/>
-                    <TextBox Margin="5,0,5,0" Text="{Binding SelectedClient.Address, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Label Content="Location"/>
-                    <TextBox Margin="5,0,5,0" Text="{Binding SelectedClient.Location, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Label Content="Telephone"/>
-                    <TextBox Margin="5,0,5,0" Text="{Binding SelectedClient.Telephone, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
-                <StackPanel Grid.Row="1">
-                    <Label Content="Order Data" FontWeight="Bold"/>
-                    <Label Content="C-client"/>
-                    <TextBox Margin="5,0,5,0" Text="{Binding SelectedOrder.CClient, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Label Content="Date order"/>
-                    <TextBox Margin="5,0,5,0" Text="{Binding SelectedOrder.DateOrder, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Label Content="Type of payment"/>
-                    <TextBox Margin="5,0,5,0" Text="{Binding SelectedOrder.TypePayment, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
-                <StackPanel Grid.Row="2">
-                    <Label Content="Article Data" FontWeight="Bold"/>
-                    <Label Content="Section"/>
-                    <TextBox Margin="5,0,5,0" Text="{Binding SelectedArticle.Section, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Label Content="Article Name"/>
-                    <TextBox Margin="5,0,5,0" Text="{Binding SelectedArticle.ArticleName, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Label Content="Price"/>
-                    <TextBox Margin="5,0,5,0" Text="{Binding SelectedArticle.Price, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Label Content="Date"/>
-                    <TextBox Margin="5,0,5,0" Text="{Binding SelectedArticle.Date, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Label Content="Origin Country"/>
-                    <TextBox Margin="5,0,5,0" Text="{Binding SelectedArticle.OriginCountry, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
+
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" >
+                        <Label Content="Client Data" FontWeight="Bold"/>
+                        <Button Content="Add new client" FontWeight="Bold" FontSize="14" Width="120" Height="30" Margin="30,0,5,0"
+                            Command="{Binding InsertClientCommand}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1">
+                        <Label Content="Client Name"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewClient.ClientName, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label Content="Address"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewClient.Address, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label Content="Location"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewClient.Location, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label Content="Telephone"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewClient.Telephone, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" >
+                        <Label Content="Order Data" FontWeight="Bold"/>
+                        <Button Content="Add new Order" FontWeight="Bold" FontSize="14" Width="120" Height="30" Margin="30,0,5,0"
+                            Command="{Binding InsertOrderCommand}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1">
+                        <Label Content="C-client"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewOrder.CClient, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label Content="Date order"/>
+                        <DatePicker  Margin="5,0,5,0" SelectedDate="{Binding NewOrder.DateOrder, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label Content="Type of payment"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewOrder.TypePayment, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" >
+                        <Label Content="Article Data" FontWeight="Bold"/>
+                        <Button Content="Add new Article" FontWeight="Bold" FontSize="14" Width="120" Height="30" Margin="30,0,5,0"
+                        Command="{Binding InsertArticleCommand}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1">
+                        <Label Content="Section"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewArticle.Section, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label Content="Article Name"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewArticle.ArticleName, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label Content="Price"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewArticle.Price, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label Content="Date"/>
+                        <DatePicker  Margin="5,0,5,0" SelectedDate="{Binding NewArticle.Date, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label Content="Origin Country"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewArticle.OriginCountry, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </Grid>
             </Grid>
         </Grid>
     </Grid>
