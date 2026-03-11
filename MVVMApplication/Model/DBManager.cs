@@ -66,7 +66,7 @@ namespace MVVMApplication.Model
         #endregion
 
         #region Create Methods
-        public int AddNewClient(Client? newClient)
+        public int AddClient(Client? newClient)
         {
             string query = $"INSERT INTO [{nameof(Client)}]" +
                            $"([{nameof(Client.ClientName)}], [{nameof(Client.Address)}], " +
@@ -83,7 +83,7 @@ namespace MVVMApplication.Model
                 return cmd.ExecuteNonQuery(); 
             });
         }
-        public int AddNewOrder(Order? newOrder)
+        public int AddOrder(Order? newOrder)
         {
             string query = $"INSERT INTO [{nameof(Order)}]" +
                            $"([{nameof(Order.CClient)}], [{nameof(Order.DateOrder)}], " +
@@ -99,7 +99,7 @@ namespace MVVMApplication.Model
                 return cmd.ExecuteNonQuery(); 
             });
         }
-        public int AddNewArticle(Article? newArticle)
+        public int AddArticle(Article? newArticle)
         {
             string query = $"INSERT INTO [{nameof(Article)}]" +
                            $"([{nameof(Article.Section)}], [{nameof(Article.ArticleName)}], " +
@@ -190,6 +190,45 @@ namespace MVVMApplication.Model
                                         ? null
                                         : reader[nameof(Article.OriginCountry)].ToString(),
             });
+        }
+        #endregion
+
+        #region Update Methods
+        public bool UpdateClient(int clientId)
+        {
+            //string query = "SELECT COUNT(*) " +
+            //                $"FROM [{nameof(Client)}] " +
+            //                $"WHERE [{nameof(Client.Id)}] = @CClient";
+            //// Use of params to avoid SQL Injection
+            //return ExecuteSqlNonReaderQuery(query, (cmd) =>
+            //{
+            //    cmd.Parameters.AddWithValue("@CClient", clientId);
+            //    return (int)cmd.ExecuteScalar();
+            //}) > 0;
+        }
+        public bool UpdateOrder(int orderId)
+        {
+            //string query = "SELECT COUNT(*) " +
+            //                $"FROM [{nameof(Client)}] " +
+            //                $"WHERE [{nameof(Client.Id)}] = @CClient";
+            //// Use of params to avoid SQL Injection
+            //return ExecuteSqlNonReaderQuery(query, (cmd) =>
+            //{
+            //    cmd.Parameters.AddWithValue("@CClient", clientId);
+            //    return (int)cmd.ExecuteScalar();
+            //}) > 0;
+        }
+        public bool UpdateArticle(int articleId)
+        {
+            //string query = "SELECT COUNT(*) " +
+            //                $"FROM [{nameof(Client)}] " +
+            //                $"WHERE [{nameof(Client.Id)}] = @CClient";
+            //// Use of params to avoid SQL Injection
+            //return ExecuteSqlNonReaderQuery(query, (cmd) =>
+            //{
+            //    cmd.Parameters.AddWithValue("@CClient", clientId);
+            //    return (int)cmd.ExecuteScalar();
+            //}) > 0;
         }
         #endregion
 

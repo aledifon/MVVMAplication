@@ -99,12 +99,16 @@ namespace MVVMApplication.ViewModel
 
             // Create instances of every Command
             GetAllClientsCommand = new RelayCommand(GetAllClients);
-            GetAllOrdersCommand = new RelayCommand(GetAllOrders, canExecute => true);
+            GetAllOrdersCommand = new RelayCommand(GetAllOrders);
             GetAllArticlesCommand = new RelayCommand(GetAllArticles);
 
-            InsertClientCommand = new RelayCommand(AddNewClient);
-            InsertOrderCommand = new RelayCommand(AddNewOrder);
-            InsertArticleCommand = new RelayCommand(AddNewArticle);
+            InsertClientCommand = new RelayCommand(AddClient, canAddClient);
+            InsertOrderCommand = new RelayCommand(AddOrder, canAddOrder);
+            InsertArticleCommand = new RelayCommand(AddArticle, canAddArticle);
+
+            UpdateClientCommand = new RelayCommand(UpdateClient, canUpdateClient);
+            UpdateOrderCommand = new RelayCommand(UpdateOrder, canUpdateOrder);
+            UpdateArticleCommand = new RelayCommand(UpdateArticle, canUpdateArticle);
 
             // Create instances of every collection
             Clients = new ObservableCollection<Client>();
@@ -116,14 +120,21 @@ namespace MVVMApplication.ViewModel
             NewArticle = new Article();
         }
 
-        #region Commands
+        #region Get Commands
         public ICommand GetAllClientsCommand { get; }        
         public ICommand GetAllOrdersCommand { get; }        
         public ICommand GetAllArticlesCommand { get; }
-
+        #endregion
+        #region Insert Commands
         public ICommand InsertClientCommand { get; }
         public ICommand InsertOrderCommand { get; }
         public ICommand InsertArticleCommand { get; }
+        #endregion
+
+        #region Update Commands
+        public ICommand UpdateClientCommand { get; }
+        public ICommand UpdateOrderCommand { get; }
+        public ICommand UpdateArticleCommand { get; }
         #endregion
 
         #region Checking Methods
@@ -133,7 +144,7 @@ namespace MVVMApplication.ViewModel
         #endregion
 
         #region Data Validation Methods
-        private bool NewClientsEmptyFieldsValidation(Client client)
+        private bool AreClientsFieldsFilled(Client client)
         {
             if (string.IsNullOrWhiteSpace(client.ClientName)) return false;
             if (string.IsNullOrWhiteSpace(client.Address)) return false;
@@ -142,7 +153,7 @@ namespace MVVMApplication.ViewModel
 
             return true;
         }
-        private bool NewArticlesEmptyFieldsValidation(Article article)
+        private bool AreArticlesFieldsFilled(Article article)
         {
             if (string.IsNullOrWhiteSpace(article.Section)) return false;
             if (string.IsNullOrWhiteSpace(article.ArticleName)) return false;
@@ -152,7 +163,7 @@ namespace MVVMApplication.ViewModel
 
             return true;
         }
-        private bool NewOrderEmptyFieldsValidation(Order order)
+        private bool AreOrderFieldsFilled(Order order)
         {            
             if (order.CClient <= 0) return false;
             if (order.DateOrder == null || order.DateOrder > DateTime.Today) return false;
@@ -190,7 +201,7 @@ namespace MVVMApplication.ViewModel
         #endregion
 
         #region Create Methods
-        private void AddNewClient(object? parameter)
+        private void AddClient(object? parameter)
         {
             // Data validation
             if (NewClient == null)
@@ -198,7 +209,7 @@ namespace MVVMApplication.ViewModel
                 MessageBox.Show($"Client data is missing");
                 return;
             }                
-            else if (!NewClientsEmptyFieldsValidation(NewClient))
+            else if (!AreClientsFieldsFilled(NewClient))
             {
                 MessageBox.Show($"All Client fields are required.");
                 return;
@@ -215,12 +226,12 @@ namespace MVVMApplication.ViewModel
             }
 
             // If all previous validations are ok then insert data on the DB
-            if (_dbRepository.AddNewClient(NewClient)>0)
+            if (_dbRepository.AddClient(NewClient)>0)
                 MessageBox.Show($"The new Client {NewClient.ClientName} was properly added to the DB.");
             else
                 MessageBox.Show($"Any new client was not added to the DB. Please check with the suport!");
         }        
-        private void AddNewOrder(object? parameter)
+        private void AddOrder(object? parameter)
         {
             // Data validation
             if (NewOrder == null)
@@ -228,7 +239,7 @@ namespace MVVMApplication.ViewModel
                 MessageBox.Show($"Order data is missing");
                 return;
             }
-            else if (!NewOrderEmptyFieldsValidation(NewOrder))
+            else if (!AreOrderFieldsFilled(NewOrder))
             {
                 MessageBox.Show($"All Order fields are required.");
                 return;
@@ -247,12 +258,12 @@ namespace MVVMApplication.ViewModel
             }
 
             // If all previous validations are ok then insert data on the DB
-            if (_dbRepository.AddNewOrder(NewOrder) > 0)
+            if (_dbRepository.AddOrder(NewOrder) > 0)
                 MessageBox.Show($"The new Order was properly added to the DB.");
             else
                 MessageBox.Show($"Any new order was not added to the DB. Please check with the support!");
         }
-        private void AddNewArticle(object? parameter)
+        private void AddArticle(object? parameter)
         {
             // Data validation
             if (NewArticle == null)
@@ -260,7 +271,7 @@ namespace MVVMApplication.ViewModel
                 MessageBox.Show($"Article data is missing");
                 return;
             }
-            else if (!NewArticlesEmptyFieldsValidation(NewArticle))
+            else if (!AreArticlesFieldsFilled(NewArticle))
             {
                 MessageBox.Show($"All Article fields are required.");
                 return;
@@ -277,14 +288,78 @@ namespace MVVMApplication.ViewModel
             }
 
             // If all previous validations are ok then insert data on the DB
-            if (_dbRepository.AddNewArticle(NewArticle) > 0)
+            if (_dbRepository.AddArticle(NewArticle) > 0)
                 MessageBox.Show($"The new Article {NewArticle.ArticleName} was properly added to the DB.");
             else
                 MessageBox.Show($"Any new article was not added to the DB. Please check with the support!");
         }
+
+        private bool canAddClient(object? obj)
+        {
+            return (NewClient != null && AreClientsFieldsFilled(NewClient));
+        }
+        private bool canAddOrder(object? obj)
+        {
+            return (NewOrder != null && AreOrderFieldsFilled(NewOrder));
+        }
+        private bool canAddArticle(object? obj)
+        {
+            return (NewArticle != null && AreArticlesFieldsFilled(NewArticle));
+        }
         #endregion
         #region Update Methods
+        private void UpdateClient(object? parameter)
+        {
+            // DATA VALIDATIONS
 
+                // DB consult
+            if (!_dbRepository.UpdateClient(SelectedClient.Id))
+            {
+                MessageBox.Show($"The client data cannot be updated because there is no client " +
+                                $"with the ID you entered .\n" +
+                                $"Pleas select an exising Client ID and try again.");
+                return;
+            }
+        }
+        private void UpdateOrder(object? parameter)
+        {
+            // DATA VALIDATIONS
+
+                // DB consult
+            if (!_dbRepository.UpdateOrder(SelectedOrder.Id))
+            {
+                MessageBox.Show($"The order data cannot be updated because there is no order " +
+                                $"with the ID you entered .\n" +
+                                $"Pleas select an exising Order ID and try again.");
+                return;
+            }
+        }
+        private void UpdateArticle(object? parameter)
+        {
+            // DATA VALIDATIONS
+
+                // DB consult
+            if (!_dbRepository.UpdateArticle(SelectedArticle.Id))
+            {
+                MessageBox.Show($"The article data cannot be updated because there is no Article " +
+                                $"with the ID you entered .\n" +
+                                $"Pleas select an exising Article ID and try again.");
+                return;
+            }
+        }
+
+        private bool canUpdateClient(object? obj)
+        {
+            return (SelectedClient != null && AreClientsFieldsFilled(SelectedClient));            
+        }
+        private bool canUpdateOrder(object? obj)
+        {
+            return (SelectedOrder != null && AreOrderFieldsFilled(SelectedOrder));            
+        }
+        private bool canUpdateArticle(object? obj)
+        {
+            return (SelectedArticle != null && AreArticlesFieldsFilled(SelectedArticle));            
+        }
         #endregion
         #region Delete Methods
 
