@@ -66,7 +66,7 @@ namespace MVVMApplication.Model
         #endregion
 
         #region Create Methods
-        public int AddClient(Client? newClient)
+        public int AddClient(Client? client)
         {
             string query = $"INSERT INTO [{nameof(Client)}]" +
                            $"([{nameof(Client.ClientName)}], [{nameof(Client.Address)}], " +
@@ -75,15 +75,15 @@ namespace MVVMApplication.Model
             // Use of params to avoid SQL Injection
             return ExecuteSqlNonReaderQuery(query, (cmd) =>
             {
-                cmd.Parameters.AddWithValue("@ClientName", newClient.ClientName);
-                cmd.Parameters.AddWithValue("@Address", newClient.Address);
-                cmd.Parameters.AddWithValue("@Location", newClient.Location);
-                cmd.Parameters.AddWithValue("@Telephone", newClient.Telephone);
+                cmd.Parameters.AddWithValue("@ClientName", client.ClientName);
+                cmd.Parameters.AddWithValue("@Address", client.Address);
+                cmd.Parameters.AddWithValue("@Location", client.Location);
+                cmd.Parameters.AddWithValue("@Telephone", client.Telephone);
 
                 return cmd.ExecuteNonQuery(); 
             });
         }
-        public int AddOrder(Order? newOrder)
+        public int AddOrder(Order? order)
         {
             string query = $"INSERT INTO [{nameof(Order)}]" +
                            $"([{nameof(Order.CClient)}], [{nameof(Order.DateOrder)}], " +
@@ -92,14 +92,14 @@ namespace MVVMApplication.Model
             // Use of params to avoid SQL Injection
             return ExecuteSqlNonReaderQuery(query, (cmd) =>
             {
-                cmd.Parameters.AddWithValue("@CClient", newOrder.CClient);
-                cmd.Parameters.AddWithValue("@DateOrder", newOrder.DateOrder);
-                cmd.Parameters.AddWithValue("@TypePayment", newOrder.TypePayment);                
+                cmd.Parameters.AddWithValue("@CClient", order.CClient);
+                cmd.Parameters.AddWithValue("@DateOrder", order.DateOrder);
+                cmd.Parameters.AddWithValue("@TypePayment", order.TypePayment);                
 
                 return cmd.ExecuteNonQuery(); 
             });
         }
-        public int AddArticle(Article? newArticle)
+        public int AddArticle(Article? article)
         {
             string query = $"INSERT INTO [{nameof(Article)}]" +
                            $"([{nameof(Article.Section)}], [{nameof(Article.ArticleName)}], " +
@@ -109,11 +109,11 @@ namespace MVVMApplication.Model
             // Use of params to avoid SQL Injection
             return ExecuteSqlNonReaderQuery(query, (cmd) =>
             {
-                cmd.Parameters.AddWithValue("@Section", newArticle.Section);
-                cmd.Parameters.AddWithValue("@ArticleName", newArticle.ArticleName);
-                cmd.Parameters.AddWithValue("@Price", newArticle.Price);
-                cmd.Parameters.AddWithValue("@Date", newArticle.Date);
-                cmd.Parameters.AddWithValue("@OriginCountry", newArticle.OriginCountry);
+                cmd.Parameters.AddWithValue("@Section", article.Section);
+                cmd.Parameters.AddWithValue("@ArticleName", article.ArticleName);
+                cmd.Parameters.AddWithValue("@Price", article.Price);
+                cmd.Parameters.AddWithValue("@Date", article.Date);
+                cmd.Parameters.AddWithValue("@OriginCountry", article.OriginCountry);
 
                 return cmd.ExecuteNonQuery(); 
             });
@@ -194,41 +194,65 @@ namespace MVVMApplication.Model
         #endregion
 
         #region Update Methods
-        public bool UpdateClient(int clientId)
+        public bool UpdateClient(Client? client)
         {
-            //string query = "SELECT COUNT(*) " +
-            //                $"FROM [{nameof(Client)}] " +
-            //                $"WHERE [{nameof(Client.Id)}] = @CClient";
-            //// Use of params to avoid SQL Injection
-            //return ExecuteSqlNonReaderQuery(query, (cmd) =>
-            //{
-            //    cmd.Parameters.AddWithValue("@CClient", clientId);
-            //    return (int)cmd.ExecuteScalar();
-            //}) > 0;
+            string query = $"UPDATE [{nameof(Client)}] " +
+                            $"SET [{nameof(Client.ClientName)}] = @ClientName ," +
+                            $"[{nameof(Client.Address)}] = @Address ," +
+                            $"[{nameof(Client.Location)}] = @Location ," +
+                            $"[{nameof(Client.Telephone)}] = @Telephone " +
+                            $"WHERE [{nameof(Client.Id)}] = @ClientId";
+            // Use of params to avoid SQL Injection
+            return ExecuteSqlNonReaderQuery(query, (cmd) =>
+            {
+                cmd.Parameters.AddWithValue("@ClientName", client.ClientName);
+                cmd.Parameters.AddWithValue("@Address", client.Address);
+                cmd.Parameters.AddWithValue("@Location", client.Location);
+                cmd.Parameters.AddWithValue("@Telephone", client.Telephone);
+                cmd.Parameters.AddWithValue("@ClientId", client.Id);
+
+                return cmd.ExecuteNonQuery();
+            }) == 1;
         }
-        public bool UpdateOrder(int orderId)
+        public bool UpdateOrder(Order? order)
         {
-            //string query = "SELECT COUNT(*) " +
-            //                $"FROM [{nameof(Client)}] " +
-            //                $"WHERE [{nameof(Client.Id)}] = @CClient";
-            //// Use of params to avoid SQL Injection
-            //return ExecuteSqlNonReaderQuery(query, (cmd) =>
-            //{
-            //    cmd.Parameters.AddWithValue("@CClient", clientId);
-            //    return (int)cmd.ExecuteScalar();
-            //}) > 0;
+            string query = $"UPDATE [{nameof(Order)}] " +
+                            $"SET [{nameof(Order.CClient)}] = @CClient ," +
+                            $"[{nameof(Order.DateOrder)}] = @DateOrder ," +
+                            $"[{nameof(Order.TypePayment)}] = @TypePayment ," +                            
+                            $"WHERE [{nameof(Order.Id)}] = @OrderId";
+            // Use of params to avoid SQL Injection
+            return ExecuteSqlNonReaderQuery(query, (cmd) =>
+            {
+                cmd.Parameters.AddWithValue("@CClient", order.CClient);
+                cmd.Parameters.AddWithValue("@DateOrder", order.DateOrder);
+                cmd.Parameters.AddWithValue("@TypePayment", order.TypePayment);                
+                cmd.Parameters.AddWithValue("@OrderId", order.Id);
+
+                return cmd.ExecuteNonQuery();
+            }) == 1;
         }
-        public bool UpdateArticle(int articleId)
+        public bool UpdateArticle(Article? article)
         {
-            //string query = "SELECT COUNT(*) " +
-            //                $"FROM [{nameof(Client)}] " +
-            //                $"WHERE [{nameof(Client.Id)}] = @CClient";
-            //// Use of params to avoid SQL Injection
-            //return ExecuteSqlNonReaderQuery(query, (cmd) =>
-            //{
-            //    cmd.Parameters.AddWithValue("@CClient", clientId);
-            //    return (int)cmd.ExecuteScalar();
-            //}) > 0;
+            string query = $"UPDATE [{nameof(Article)}] " +
+                            $"SET [{nameof(Article.Section)}] = @Section ," +
+                            $"[{nameof(Article.ArticleName)}] = @ArticleName ," +
+                            $"[{nameof(Article.Price)}] = @Price ," +
+                            $"[{nameof(Article.Date)}] = @Date ," +
+                            $"[{nameof(Article.OriginCountry)}] = @OriginCountry ," +
+                            $"WHERE [{nameof(Article.Id)}] = @ArticleId";
+            // Use of params to avoid SQL Injection
+            return ExecuteSqlNonReaderQuery(query, (cmd) =>
+            {
+                cmd.Parameters.AddWithValue("@Section", article.Section);
+                cmd.Parameters.AddWithValue("@ArticleName", article.ArticleName);
+                cmd.Parameters.AddWithValue("@Price", article.Price);
+                cmd.Parameters.AddWithValue("@Date", article.Date);
+                cmd.Parameters.AddWithValue("@OriginCountry", article.OriginCountry);
+                cmd.Parameters.AddWithValue("@Id", article.Id);
+
+                return cmd.ExecuteNonQuery();
+            }) == 1;
         }
         #endregion
 

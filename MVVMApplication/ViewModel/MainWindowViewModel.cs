@@ -313,7 +313,7 @@ namespace MVVMApplication.ViewModel
             // DATA VALIDATIONS
 
                 // DB consult
-            if (!_dbRepository.UpdateClient(SelectedClient.Id))
+            if (!_dbRepository.UpdateClient(SelectedClient))
             {
                 MessageBox.Show($"The client data cannot be updated because there is no client " +
                                 $"with the ID you entered .\n" +
@@ -325,8 +325,10 @@ namespace MVVMApplication.ViewModel
         {
             // DATA VALIDATIONS
 
+            // Check if the SelectedOrder.cClient correspond with an existen Client.Id?
+
                 // DB consult
-            if (!_dbRepository.UpdateOrder(SelectedOrder.Id))
+            if (!_dbRepository.UpdateOrder(SelectedOrder))
             {
                 MessageBox.Show($"The order data cannot be updated because there is no order " +
                                 $"with the ID you entered .\n" +
@@ -339,7 +341,7 @@ namespace MVVMApplication.ViewModel
             // DATA VALIDATIONS
 
                 // DB consult
-            if (!_dbRepository.UpdateArticle(SelectedArticle.Id))
+            if (!_dbRepository.UpdateArticle(SelectedArticle))
             {
                 MessageBox.Show($"The article data cannot be updated because there is no Article " +
                                 $"with the ID you entered .\n" +
