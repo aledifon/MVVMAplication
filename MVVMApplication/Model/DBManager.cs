@@ -27,7 +27,7 @@ namespace MVVMApplication.Model
         // GetAllArticlesByPriceRange(PriceRange)
 
         #region Check Methods
-        public bool FindClientByName(Client client)
+        public int FindClientByName(Client client)
         {
             string query = "SELECT COUNT(*) " +
                             $"FROM [{nameof(Client)}] " +
@@ -37,9 +37,9 @@ namespace MVVMApplication.Model
             {
                 cmd.Parameters.AddWithValue("@ClientName", client.ClientName);                
                 return (int)cmd.ExecuteScalar();
-            }) > 0;
+            });
         }
-        public bool FindArticleByName(Article article)
+        public int FindArticleByName(Article article)
         {
             string query = "SELECT COUNT(*) " +
                             $"FROM [{nameof(Article)}] " +
@@ -49,9 +49,9 @@ namespace MVVMApplication.Model
             {
                 cmd.Parameters.AddWithValue("@ArticleName", article.ArticleName);                
                 return (int)cmd.ExecuteScalar();
-            }) > 0;
+            });
         }
-        public bool FindClientByOrderId(int clientId)
+        public int FindClientByOrderId(int clientId)
         {
             string query = "SELECT COUNT(*) " +
                             $"FROM [{nameof(Client)}] " +
@@ -61,7 +61,7 @@ namespace MVVMApplication.Model
             {
                 cmd.Parameters.AddWithValue("@CClient", clientId);                
                 return (int)cmd.ExecuteScalar();
-            }) > 0;
+            });
         }
         #endregion
 
@@ -197,9 +197,9 @@ namespace MVVMApplication.Model
         public bool UpdateClient(Client? client)
         {
             string query = $"UPDATE [{nameof(Client)}] " +
-                            $"SET [{nameof(Client.ClientName)}] = @ClientName ," +
-                            $"[{nameof(Client.Address)}] = @Address ," +
-                            $"[{nameof(Client.Location)}] = @Location ," +
+                            $"SET [{nameof(Client.ClientName)}] = @ClientName, " +
+                            $"[{nameof(Client.Address)}] = @Address, " +
+                            $"[{nameof(Client.Location)}] = @Location, " +
                             $"[{nameof(Client.Telephone)}] = @Telephone " +
                             $"WHERE [{nameof(Client.Id)}] = @ClientId";
             // Use of params to avoid SQL Injection
@@ -217,9 +217,9 @@ namespace MVVMApplication.Model
         public bool UpdateOrder(Order? order)
         {
             string query = $"UPDATE [{nameof(Order)}] " +
-                            $"SET [{nameof(Order.CClient)}] = @CClient ," +
-                            $"[{nameof(Order.DateOrder)}] = @DateOrder ," +
-                            $"[{nameof(Order.TypePayment)}] = @TypePayment ," +                            
+                            $"SET [{nameof(Order.CClient)}] = @CClient, " +
+                            $"[{nameof(Order.DateOrder)}] = @DateOrder, " +
+                            $"[{nameof(Order.TypePayment)}] = @TypePayment " +                            
                             $"WHERE [{nameof(Order.Id)}] = @OrderId";
             // Use of params to avoid SQL Injection
             return ExecuteSqlNonReaderQuery(query, (cmd) =>
@@ -239,7 +239,7 @@ namespace MVVMApplication.Model
                             $"[{nameof(Article.ArticleName)}] = @ArticleName ," +
                             $"[{nameof(Article.Price)}] = @Price ," +
                             $"[{nameof(Article.Date)}] = @Date ," +
-                            $"[{nameof(Article.OriginCountry)}] = @OriginCountry ," +
+                            $"[{nameof(Article.OriginCountry)}] = @OriginCountry " +
                             $"WHERE [{nameof(Article.Id)}] = @ArticleId";
             // Use of params to avoid SQL Injection
             return ExecuteSqlNonReaderQuery(query, (cmd) =>
@@ -249,7 +249,7 @@ namespace MVVMApplication.Model
                 cmd.Parameters.AddWithValue("@Price", article.Price);
                 cmd.Parameters.AddWithValue("@Date", article.Date);
                 cmd.Parameters.AddWithValue("@OriginCountry", article.OriginCountry);
-                cmd.Parameters.AddWithValue("@Id", article.Id);
+                cmd.Parameters.AddWithValue("@ArticleId", article.Id);
 
                 return cmd.ExecuteNonQuery();
             }) == 1;

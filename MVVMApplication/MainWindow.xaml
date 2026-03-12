@@ -33,7 +33,7 @@
         </StackPanel>
 
         <!--Global Grid-->
-        <Grid 
+        <Grid             
             Grid.RowSpan="3" Grid.ColumnSpan="2" Margin="0,78,0,0">
             <!--d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=True}">-->
             <Grid.ColumnDefinitions>
@@ -43,46 +43,115 @@
 
             <!--Consult Clients/Order/Articles Data-->
             <TabControl 
+                LostFocus="TabControl_LostFocus"
+                SelectionChanged="TabControl_SelectionChanged"
                 HorizontalAlignment="Stretch" 
-                VerticalAlignment="Stretch">
+                VerticalAlignment="Stretch" >
                 <TabItem Header="Clients">
-                    <DataGrid 
-                        ItemsSource="{Binding Clients}" 
-                        SelectedItem="{Binding SelectedClient}" 
-                        AutoGenerateColumns="False">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Client Name" Binding="{Binding ClientName}"/>
-                            <DataGridTextColumn Header="Address" Binding="{Binding Address}"/>
-                            <DataGridTextColumn Header="Location" Binding="{Binding Location}"/>
-                            <DataGridTextColumn Header="Telephone" Binding="{Binding Telephone}"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="104*"/>
+                            <ColumnDefinition Width="173*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel  
+                            Orientation="Horizontal" 
+                            HorizontalAlignment="Left" Margin="5,5,0,5" Grid.ColumnSpan="2">
+                            <Button 
+                                Content="Update Selected Client" 
+                                Width="130" Height="30" Margin="0,0,5,0"
+                                Command="{Binding UpdateClientCommand}"/>
+                            <Button 
+                                Content="Delete Selected Client" 
+                                Width="130" Height="30" Margin="5,0,5,0"
+                                Command=""/>
+                        </StackPanel>
+
+                        <DataGrid 
+                            Grid.Row="1"
+                            ItemsSource="{Binding Clients}" 
+                            SelectedItem="{Binding SelectedClient}" 
+                            AutoGenerateColumns="False" Grid.ColumnSpan="2">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Client Name" Binding="{Binding ClientName}"/>
+                                <DataGridTextColumn Header="Address" Binding="{Binding Address}"/>
+                                <DataGridTextColumn Header="Location" Binding="{Binding Location}"/>
+                                <DataGridTextColumn Header="Telephone" Binding="{Binding Telephone}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
                 </TabItem>
                 <TabItem Header="Orders">
-                    <DataGrid 
-                        ItemsSource="{Binding Orders}" 
-                        SelectedItem="{Binding SelectedOrder}" 
-                        AutoGenerateColumns="False">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="C-Client" Binding="{Binding CClient}"/>
-                            <DataGridTextColumn Header="Date Order" Binding="{Binding DateOrder}"/>
-                            <DataGridTextColumn Header="Type of Payment" Binding="{Binding TypePayment}"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel  
+                            Orientation="Horizontal" 
+                            HorizontalAlignment="Left" Margin="5,5,5,5">
+                            <Button 
+                                    Content="Update Selected Order" 
+                                    Width="130" Height="30" Margin="0,0,5,0"
+                                    Command="{Binding UpdateOrderCommand}"/>
+                            <Button 
+                                    Content="Delete Selected Order" 
+                                    Width="130" Height="30" Margin="5,0,5,0"
+                                    Command=""/>
+                        </StackPanel>
+
+                        <DataGrid 
+                            Grid.Row="1"
+                            ItemsSource="{Binding Orders}" 
+                            SelectedItem="{Binding SelectedOrder}" 
+                            AutoGenerateColumns="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="C-Client" Binding="{Binding CClient}"/>
+                                <DataGridTextColumn Header="Date Order" Binding="{Binding DateOrder, StringFormat=dd/MM/yyyy}"/>
+                                <DataGridTextColumn Header="Type of Payment" Binding="{Binding TypePayment}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
                 </TabItem>
                 <TabItem Header="Articles">
-                    <DataGrid 
-                        ItemsSource="{Binding Articles}" 
-                        SelectedItem="{Binding SelectedArticle}"
-                        AutoGenerateColumns="False">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Section" Binding="{Binding Section}"/>
-                            <DataGridTextColumn Header="Article Name" Binding="{Binding ArticleName}"/>
-                            <DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
-                            <DataGridTextColumn Header="Date" Binding="{Binding Date}"/>
-                            <DataGridTextColumn Header="Origin Country" Binding="{Binding OriginCountry}"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel  
+                            Orientation="Horizontal" 
+                            HorizontalAlignment="Left" Margin="5,5,5,5">
+                            <Button 
+                                    Content="Update Selected Article" 
+                                    Width="130" Height="30" Margin="0,0,5,0"
+                                    Command="{Binding UpdateArticleCommand}"/>
+                            <Button 
+                                    Content="Delete Selected Article" 
+                                    Width="130" Height="30" Margin="5,0,5,0"
+                                    Command=""/>
+                        </StackPanel>
+
+                        <DataGrid 
+                            Grid.Row="1"
+                            ItemsSource="{Binding Articles}" 
+                            SelectedItem="{Binding SelectedArticle}"
+                            AutoGenerateColumns="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Section" Binding="{Binding Section}"/>
+                                <DataGridTextColumn Header="Article Name" Binding="{Binding ArticleName}"/>
+                                <DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
+                                <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=dd/MM/yyyy}"/>
+                                <DataGridTextColumn Header="Origin Country" Binding="{Binding OriginCountry}"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
                 </TabItem>
             </TabControl>
 

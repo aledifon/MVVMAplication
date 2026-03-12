@@ -138,13 +138,13 @@ namespace MVVMApplication.ViewModel
         #endregion
 
         #region Checking Methods
-        private bool FindClientByName(Client client) => _dbRepository.FindClientByName(client);
-        private bool FindArticleByName(Article article) => _dbRepository.FindArticleByName(article);
-        private bool FindClientByOrderId(int clientId) => _dbRepository.FindClientByOrderId(clientId);
+        private int FindClientByName(Client client) => _dbRepository.FindClientByName(client);
+        private int FindArticleByName(Article article) => _dbRepository.FindArticleByName(article);
+        private int FindClientByOrderId(int clientId) => _dbRepository.FindClientByOrderId(clientId);
         #endregion
 
         #region Data Validation Methods
-        private bool AreClientsFieldsFilled(Client client)
+        private bool AreClientFieldsFilled(Client client)
         {
             if (string.IsNullOrWhiteSpace(client.ClientName)) return false;
             if (string.IsNullOrWhiteSpace(client.Address)) return false;
@@ -153,7 +153,7 @@ namespace MVVMApplication.ViewModel
 
             return true;
         }
-        private bool AreArticlesFieldsFilled(Article article)
+        private bool AreArticleFieldsFilled(Article article)
         {
             if (string.IsNullOrWhiteSpace(article.Section)) return false;
             if (string.IsNullOrWhiteSpace(article.ArticleName)) return false;
@@ -209,7 +209,7 @@ namespace MVVMApplication.ViewModel
                 MessageBox.Show($"Client data is missing");
                 return;
             }                
-            else if (!AreClientsFieldsFilled(NewClient))
+            else if (!AreClientFieldsFilled(NewClient))
             {
                 MessageBox.Show($"All Client fields are required.");
                 return;
@@ -219,17 +219,21 @@ namespace MVVMApplication.ViewModel
             // Max Length Validation (Optional)
 
             // Duplicates validation
-            else if (FindClientByName(NewClient))
+            else if (FindClientByName(NewClient) > 0)
             {
-                MessageBox.Show($"The inserted Client already exists on the DB.");
+                MessageBox.Show($"The inserted Client already exists on the DB.\n" +
+                                $"Please, try with a different Client Name");
                 return;
             }
 
             // If all previous validations are ok then insert data on the DB
-            if (_dbRepository.AddClient(NewClient)>0)
+            if (_dbRepository.AddClient(NewClient) > 0)
+            {
                 MessageBox.Show($"The new Client {NewClient.ClientName} was properly added to the DB.");
+                GetAllClients(null);
+            }
             else
-                MessageBox.Show($"Any new client was not added to the DB. Please check with the suport!");
+                MessageBox.Show($"No new client was added to the DB. Please check with the suport!");
         }        
         private void AddOrder(object? parameter)
         {
@@ -249,7 +253,7 @@ namespace MVVMApplication.ViewModel
             // Max Length Validation (Optional)
 
             // Client Id validation
-            else if (!FindClientByOrderId(NewOrder.CClient))
+            else if (FindClientByOrderId(NewOrder.CClient) != 1)
             {
                 MessageBox.Show($"The order cannot be created because there is no client " +
                                 $"with the ID you entered as CClient.\n" +
@@ -259,9 +263,12 @@ namespace MVVMApplication.ViewModel
 
             // If all previous validations are ok then insert data on the DB
             if (_dbRepository.AddOrder(NewOrder) > 0)
+            {
                 MessageBox.Show($"The new Order was properly added to the DB.");
+                GetAllOrders(null);
+            }
             else
-                MessageBox.Show($"Any new order was not added to the DB. Please check with the support!");
+                MessageBox.Show($"No new order was added to the DB. Please check with the support!");
         }
         private void AddArticle(object? parameter)
         {
@@ -271,7 +278,7 @@ namespace MVVMApplication.ViewModel
                 MessageBox.Show($"Article data is missing");
                 return;
             }
-            else if (!AreArticlesFieldsFilled(NewArticle))
+            else if (!AreArticleFieldsFilled(NewArticle))
             {
                 MessageBox.Show($"All Article fields are required.");
                 return;
@@ -281,22 +288,26 @@ namespace MVVMApplication.ViewModel
             // Max Length Validation (Optional)
 
             // Duplicates validation
-            else if (FindArticleByName(NewArticle))
+            else if (FindArticleByName(NewArticle) > 0)
             {
-                MessageBox.Show($"The inserted Article already exists on the DB.");
+                MessageBox.Show($"The inserted Article already exists on the DB.\n" +
+                                $"Please, try with a different Article Name");
                 return;
             }
 
             // If all previous validations are ok then insert data on the DB
             if (_dbRepository.AddArticle(NewArticle) > 0)
+            {
                 MessageBox.Show($"The new Article {NewArticle.ArticleName} was properly added to the DB.");
+                GetAllArticles(null);
+            }
             else
-                MessageBox.Show($"Any new article was not added to the DB. Please check with the support!");
+                MessageBox.Show($"No new article was added to the DB. Please check with the support!");
         }
 
         private bool canAddClient(object? obj)
         {
-            return (NewClient != null && AreClientsFieldsFilled(NewClient));
+            return (NewClient != null && AreClientFieldsFilled(NewClient));
         }
         private bool canAddOrder(object? obj)
         {
@@ -304,55 +315,171 @@ namespace MVVMApplication.ViewModel
         }
         private bool canAddArticle(object? obj)
         {
-            return (NewArticle != null && AreArticlesFieldsFilled(NewArticle));
+            return (NewArticle != null && AreArticleFieldsFilled(NewArticle));
         }
         #endregion
         #region Update Methods
         private void UpdateClient(object? parameter)
         {
-            // DATA VALIDATIONS
+            // User Confirmation
+            if (MessageBox.Show(
+                "Are you sure you want to update the selected Client data?",
+                "Update Client Data Confirmation",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question
+                ) == MessageBoxResult.No)
+            {
+                GetAllClients(null);
+                return;
+            }                
 
-                // DB consult
+            // Data validation
+            if (SelectedClient == null)
+            {
+                MessageBox.Show($"Client data is missing");
+                GetAllClients(null);
+                return;
+            }
+            else if (!AreClientFieldsFilled(SelectedClient))
+            {
+                MessageBox.Show($"All Client fields are required.");
+                GetAllClients(null);
+                return;
+            }
+
+            // Format Data Validation (Optional)
+            // Max Length Validation (Optional)
+
+            // Duplicates validation
+            else if (FindClientByName(SelectedClient) > 1)
+            {
+                MessageBox.Show($"The inserted Client already exists on the DB.\n" +
+                                $"Please, try with a different Client Name");
+                GetAllClients(null);
+                return;
+            }
+            
+            // DB consult
             if (!_dbRepository.UpdateClient(SelectedClient))
             {
                 MessageBox.Show($"The client data cannot be updated because there is no client " +
                                 $"with the ID you entered .\n" +
-                                $"Pleas select an exising Client ID and try again.");
+                                $"Please select an exising Client and try again.");
+                GetAllClients(null);
                 return;
             }
+            else
+                MessageBox.Show($"The Selected client was properly updtated on the DB.");
         }
         private void UpdateOrder(object? parameter)
         {
-            // DATA VALIDATIONS
+            // User Confirmation
+            if (MessageBox.Show(
+                "Are you sure you want to update the selected Order data?",
+                "Update Order Data Confirmation",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question
+                ) == MessageBoxResult.No)
+            {
+                GetAllOrders(null);
+                return;
+            }
 
-            // Check if the SelectedOrder.cClient correspond with an existen Client.Id?
+            // Data validation
+            if (SelectedOrder == null)
+            {
+                MessageBox.Show($"Order data is missing");
+                GetAllOrders(null);
+                return;
+            }
+            else if (!AreOrderFieldsFilled(SelectedOrder))
+            {
+                MessageBox.Show($"All Order fields are required.");
+                GetAllOrders(null);
+                return;
+            }
 
-                // DB consult
+            // Format Data Validation (Optional)
+            // Max Length Validation (Optional)
+
+            // Client Id validation
+            else if (FindClientByOrderId(SelectedOrder.CClient) != 1)
+            {
+                MessageBox.Show($"The order cannot be updated because there is no client " +
+                                $"with the ID you entered as CClient.\n" +
+                                $"Please select an exising Client ID and try again.");
+                GetAllOrders(null);
+                return;
+            }
+
+            // DB consult
             if (!_dbRepository.UpdateOrder(SelectedOrder))
             {
                 MessageBox.Show($"The order data cannot be updated because there is no order " +
                                 $"with the ID you entered .\n" +
-                                $"Pleas select an exising Order ID and try again.");
+                                $"Please select an exising Order and try again.");
+                GetAllOrders(null);
                 return;
             }
+            else
+                MessageBox.Show($"The Selected Order was properly updtated on the DB.");
         }
         private void UpdateArticle(object? parameter)
         {
-            // DATA VALIDATIONS
-
-                // DB consult
-            if (!_dbRepository.UpdateArticle(SelectedArticle))
+            // User Confirmation
+            if (MessageBox.Show(
+                "Are you sure you want to update the selected Article data?",
+                "Update Article Data Confirmation",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question
+                ) == MessageBoxResult.No)
             {
-                MessageBox.Show($"The article data cannot be updated because there is no Article " +
-                                $"with the ID you entered .\n" +
-                                $"Pleas select an exising Article ID and try again.");
+                GetAllArticles(null);
                 return;
             }
+
+            // Data validation
+            if (SelectedArticle == null)
+            {
+                MessageBox.Show($"Article data is missing");
+                GetAllArticles(null);
+                return;
+            }
+            else if (!AreArticleFieldsFilled(SelectedArticle))
+            {
+                MessageBox.Show($"All Article fields are required.");
+                GetAllArticles(null);
+                return;
+            }
+
+            // Format Data Validation (Optional)
+            // Max Length Validation (Optional)
+
+            // Duplicates validation
+            else if (FindArticleByName(SelectedArticle) > 1)
+            {
+                MessageBox.Show($"The inserted Article already exists on the DB.\n" +
+                                $"Please, try with a different Article Name");
+                GetAllArticles(null);
+                return;
+            }
+
+            // DB consult
+            if (!_dbRepository.UpdateArticle(SelectedArticle))
+            {
+                MessageBox.Show($"The article data cannot be updated because there is no article " +
+                                $"with the ID you entered .\n" +
+                                $"Please, select an exising Article and try again.");
+                GetAllArticles(null);
+                return;
+            }
+            else
+                MessageBox.Show($"The Selected Article was properly updtated on the DB.");
         }
 
         private bool canUpdateClient(object? obj)
         {
-            return (SelectedClient != null && AreClientsFieldsFilled(SelectedClient));            
+            return (SelectedClient != null && AreClientFieldsFilled(SelectedClient));            
         }
         private bool canUpdateOrder(object? obj)
         {
@@ -360,7 +487,7 @@ namespace MVVMApplication.ViewModel
         }
         private bool canUpdateArticle(object? obj)
         {
-            return (SelectedArticle != null && AreArticlesFieldsFilled(SelectedArticle));            
+            return (SelectedArticle != null && AreArticleFieldsFilled(SelectedArticle));            
         }
         #endregion
         #region Delete Methods

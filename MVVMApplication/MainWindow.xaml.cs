@@ -17,10 +17,47 @@ namespace MVVMApplication
     /// </summary>
     public partial class MainWindow : Window
     {
+        private TabItem? _previoustab = null;
+
         public MainWindow()
         {
             InitializeComponent();            
             DataContext = new MainWindowViewModel();
+        }
+
+        #region Event Handlers
+        // Event handler to detect switching between the Tabs of the TabControl.
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(sender is TabControl tabControl && DataContext is MainWindowViewModel vm)
+            {
+                if(tabControl.SelectedItem is TabItem selectedTab && selectedTab != _previoustab)
+                {
+                    CleanRefsOfSelectedData(vm);
+                    _previoustab = selectedTab;
+                }                
+            }
+        }
+
+        // Event handler to detect lost of focus of the Tab Control.
+        // Only will be clean when TabControl has really lost its focus
+        private void TabControl_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TabControl tabControl && DataContext is MainWindowViewModel vm)
+            {
+                if (!tabControl.IsKeyboardFocusWithin)
+                    CleanRefsOfSelectedData(vm);
+            }            
+        }
+        #endregion
+
+        private void CleanRefsOfSelectedData(MainWindowViewModel? vm) 
+        {
+            if (vm is null) return;
+
+            vm.SelectedClient = null;
+            vm.SelectedOrder = null;
+            vm.SelectedArticle = null;
         }
     }
 }
