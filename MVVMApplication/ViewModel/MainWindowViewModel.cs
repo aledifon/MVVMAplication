@@ -121,7 +121,7 @@ namespace MVVMApplication.ViewModel
             _dbRepository = new DBManager();
 
             // Create instances of every Command
-            GetAllClientsCommand = new RelayCommand(GetAllClients);
+            GetAllClientsCommand = new RelayCommand(GetAllClientsAsync);
             GetAllOrdersCommand = new RelayCommand(GetAllOrders);
             GetAllArticlesCommand = new RelayCommand(GetAllArticles);
 
@@ -186,9 +186,9 @@ namespace MVVMApplication.ViewModel
         #endregion
 
         #region Read Methods
-        private void GetAllClients(object? parameter)
+        private async void GetAllClientsAsync(object? parameter)
         {
-            var tempClients = _dbRepository.GetAllClients();
+            var tempClients = await _dbRepository.GetAllClientsAsync();
 
             Clients.Clear();                                    // Doing this instead of replacing the ref. with a new one
                                                                 // Otherwise this will break the bindings with the UI and therefore
@@ -245,7 +245,7 @@ namespace MVVMApplication.ViewModel
             if (_dbRepository.AddClient(NewClient) > 0)
             {
                 MessageBox.Show($"The new Client {NewClient.ClientName} was properly added to the DB.");
-                GetAllClients(null);
+                GetAllClientsAsync(null);
             }
             else
                 MessageBox.Show($"No new client was added to the DB. Please check with the suport!");
@@ -344,7 +344,7 @@ namespace MVVMApplication.ViewModel
                 MessageBoxImage.Question
                 ) == MessageBoxResult.No)
             {
-                GetAllClients(null);
+                GetAllClientsAsync(null);
                 return;
             }                
 
@@ -352,13 +352,13 @@ namespace MVVMApplication.ViewModel
             if (SelectedClient == null)
             {
                 MessageBox.Show($"Client data is missing");
-                GetAllClients(null);
+                GetAllClientsAsync(null);
                 return;
             }
             else if (!AreClientFieldsFilled(SelectedClient))
             {
                 MessageBox.Show($"All Client fields are required.");
-                GetAllClients(null);
+                GetAllClientsAsync(null);
                 return;
             }
 
@@ -370,7 +370,7 @@ namespace MVVMApplication.ViewModel
             {
                 MessageBox.Show($"The inserted Client already exists on the DB.\n" +
                                 $"Please, try with a different Client Name");
-                GetAllClients(null);
+                GetAllClientsAsync(null);
                 return;
             }
             
@@ -380,7 +380,7 @@ namespace MVVMApplication.ViewModel
                 MessageBox.Show($"The client data cannot be updated because there is no client " +
                                 $"with the ID you entered .\n" +
                                 $"Please select an exising Client and try again.");
-                GetAllClients(null);
+                GetAllClientsAsync(null);
                 return;
             }
             else
@@ -538,7 +538,7 @@ namespace MVVMApplication.ViewModel
                 MessageBoxImage.Question
                 ) == MessageBoxResult.No)
                 {
-                    GetAllClients(null);
+                    GetAllClientsAsync(null);
                     return;
                 }                
             }
@@ -549,13 +549,13 @@ namespace MVVMApplication.ViewModel
                 MessageBox.Show($"The client data cannot be deleted because there is no client " +
                                 $"with the ID you entered .\n" +
                                 $"Please select an exising Client and try again.");
-                GetAllClients(null);
+                GetAllClientsAsync(null);
                 GetAllOrders(null);
             }
             else
             {
                 MessageBox.Show($"The Selected client was properly deleted from the DB.");
-                GetAllClients(null);
+                GetAllClientsAsync(null);
                 GetAllOrders(null);
             }
         }

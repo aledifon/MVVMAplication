@@ -149,10 +149,10 @@ namespace MVVMApplication.Model
         #endregion
 
         #region Read Methods        
-        public ObservableCollection<Client> GetAllClients()
+        public async Task<ObservableCollection<Client>> GetAllClientsAsync()
         {
             string query = "SELECT * FROM [" + nameof(Client) + "]";
-            return ExecuteSqlReaderQuery(
+            return await ExecuteSqlReaderQueryAsync(
                 query, 
                 null,
                 reader => new Client
@@ -179,7 +179,7 @@ namespace MVVMApplication.Model
         public ObservableCollection<Order> GetAllOrders()
         {
             string query = "SELECT * FROM [" + nameof(Order) + "]";
-            return ExecuteSqlReaderQuery(
+            return ExecuteSqlReaderQueryAsync(
                 query,
                 null,
                 reader => new Order
@@ -200,7 +200,7 @@ namespace MVVMApplication.Model
         public ObservableCollection<Article> GetAllArticles()
         {
             string query = "SELECT * FROM [" + nameof(Article) + "]";
-            return ExecuteSqlReaderQuery(
+            return ExecuteSqlReaderQueryAsync(
                 query,
                 null,
                 reader => new Article
@@ -345,7 +345,7 @@ namespace MVVMApplication.Model
         #endregion
 
         #region Queries Methods
-        private ObservableCollection<T> ExecuteSqlReaderQuery<T>(
+        private async Task<ObservableCollection<T>> ExecuteSqlReaderQueryAsync<T>(
             string query, 
             Action<SqlCommand>? parameterize, 
             Func<SqlDataReader, T> mapper)
@@ -356,15 +356,15 @@ namespace MVVMApplication.Model
             {
                 using (var conn = new SqlConnection(connectionString))
                 {
-                    conn.Open();
+                    await conn.OpenAsync();
 
                     using (var cmd = new SqlCommand(query, conn))
                     {
                         parameterize?.Invoke(cmd);
 
-                        using (var reader = cmd.ExecuteReader())
+                        using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 lista.Add(mapper(reader));
                             }
