@@ -33,7 +33,7 @@
         </StackPanel>
 
         <!--Global Grid-->
-        <Grid             
+        <Grid                         
             Grid.RowSpan="3" Grid.ColumnSpan="2" Margin="0,78,0,0">
             <!--d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel, IsDesignTimeCreatable=True}">-->
             <Grid.ColumnDefinitions>
@@ -68,7 +68,7 @@
                             <Button 
                                 Content="Delete Selected Client" 
                                 Width="130" Height="30" Margin="5,0,5,0"
-                                Command=""/>
+                                Command="{Binding DeleteClientCommand}"/>
                         </StackPanel>
 
                         <DataGrid 
@@ -102,7 +102,7 @@
                             <Button 
                                     Content="Delete Selected Order" 
                                     Width="130" Height="30" Margin="5,0,5,0"
-                                    Command=""/>
+                                    Command="{Binding DeleteOrderCommand}"/>
                         </StackPanel>
 
                         <DataGrid 
@@ -135,7 +135,7 @@
                             <Button 
                                     Content="Delete Selected Article" 
                                     Width="130" Height="30" Margin="5,0,5,0"
-                                    Command=""/>
+                                    Command="{Binding DeleteArticleCommand}"/>
                         </StackPanel>
 
                         <DataGrid 

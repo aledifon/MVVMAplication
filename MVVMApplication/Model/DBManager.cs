@@ -33,7 +33,9 @@ namespace MVVMApplication.Model
                             $"FROM [{nameof(Client)}] " +
                             $"WHERE [{nameof(Client.ClientName)}] = @ClientName";            
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(query, (cmd) =>
+            return ExecuteSqlScalarQuery(
+                query, 
+                (cmd) =>
             {
                 cmd.Parameters.AddWithValue("@ClientName", client.ClientName);                
                 return (int)cmd.ExecuteScalar();
@@ -45,7 +47,9 @@ namespace MVVMApplication.Model
                             $"FROM [{nameof(Article)}] " +
                             $"WHERE [{nameof(Article.ArticleName)}] = @ArticleName";            
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(query, (cmd) =>
+            return ExecuteSqlScalarQuery(
+                query, 
+                (cmd) =>
             {
                 cmd.Parameters.AddWithValue("@ArticleName", article.ArticleName);                
                 return (int)cmd.ExecuteScalar();
@@ -57,12 +61,30 @@ namespace MVVMApplication.Model
                             $"FROM [{nameof(Client)}] " +
                             $"WHERE [{nameof(Client.Id)}] = @CClient";            
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(query, (cmd) =>
+            return ExecuteSqlScalarQuery(
+                query, 
+                (cmd) =>
             {
                 cmd.Parameters.AddWithValue("@CClient", clientId);                
                 return (int)cmd.ExecuteScalar();
             });
         }
+        public bool ClientHasOrders(int clientId)
+        {                         
+            string query = "SELECT COUNT(*) " +
+                            $"FROM [{nameof(Order)}] " +
+                            $"WHERE [{nameof(Order.CClient)}] = @IdClient";
+
+            int count = ExecuteSqlScalarQuery(
+                query, 
+                cmd => 
+                {
+                    cmd.Parameters.AddWithValue("@IdClient", clientId);
+                    return (int)cmd.ExecuteScalar(); 
+                });
+
+            return count > 0;
+        }        
         #endregion
 
         #region Create Methods
@@ -73,7 +95,9 @@ namespace MVVMApplication.Model
                            $"[{nameof(Client.Location)}] , [{nameof(Client.Telephone)}])" +
                            $"VALUES (@ClientName, @Address, @Location, @Telephone)";   
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(query, (cmd) =>
+            return ExecuteSqlNonReaderQuery(
+                query,                 
+                cmd =>
             {
                 cmd.Parameters.AddWithValue("@ClientName", client.ClientName);
                 cmd.Parameters.AddWithValue("@Address", client.Address);
@@ -90,7 +114,9 @@ namespace MVVMApplication.Model
                            $"[{nameof(Order.TypePayment)}])" +
                            $"VALUES (@CClient, @DateOrder, @TypePayment)";
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(query, (cmd) =>
+            return ExecuteSqlNonReaderQuery(
+                query, 
+                (cmd) =>
             {
                 cmd.Parameters.AddWithValue("@CClient", order.CClient);
                 cmd.Parameters.AddWithValue("@DateOrder", order.DateOrder);
@@ -107,7 +133,9 @@ namespace MVVMApplication.Model
                            $"[{nameof(Article.OriginCountry)}])" +
                            $"VALUES (@Section, @ArticleName, @Price, @Date, @OriginCountry)";
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(query, (cmd) =>
+            return ExecuteSqlNonReaderQuery(
+                query, 
+                (cmd) =>
             {
                 cmd.Parameters.AddWithValue("@Section", article.Section);
                 cmd.Parameters.AddWithValue("@ArticleName", article.ArticleName);
@@ -124,7 +152,10 @@ namespace MVVMApplication.Model
         public ObservableCollection<Client> GetAllClients()
         {
             string query = "SELECT * FROM [" + nameof(Client) + "]";
-            return ExecuteSqlReaderQuery(query, reader => new Client
+            return ExecuteSqlReaderQuery(
+                query, 
+                null,
+                reader => new Client
             {
                 Id = (int)reader[nameof(Client.Id)],
 
@@ -148,7 +179,10 @@ namespace MVVMApplication.Model
         public ObservableCollection<Order> GetAllOrders()
         {
             string query = "SELECT * FROM [" + nameof(Order) + "]";
-            return ExecuteSqlReaderQuery(query, reader => new Order
+            return ExecuteSqlReaderQuery(
+                query,
+                null,
+                reader => new Order
             {
                 Id = (int)reader[nameof(Order.Id)],
 
@@ -166,7 +200,10 @@ namespace MVVMApplication.Model
         public ObservableCollection<Article> GetAllArticles()
         {
             string query = "SELECT * FROM [" + nameof(Article) + "]";
-            return ExecuteSqlReaderQuery(query, reader => new Article
+            return ExecuteSqlReaderQuery(
+                query,
+                null,
+                reader => new Article
             {
                 Id = (int)reader[nameof(Article.Id)],
 
@@ -203,7 +240,9 @@ namespace MVVMApplication.Model
                             $"[{nameof(Client.Telephone)}] = @Telephone " +
                             $"WHERE [{nameof(Client.Id)}] = @ClientId";
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(query, (cmd) =>
+            return ExecuteSqlNonReaderQuery(
+                query, 
+                (cmd) =>
             {
                 cmd.Parameters.AddWithValue("@ClientName", client.ClientName);
                 cmd.Parameters.AddWithValue("@Address", client.Address);
@@ -222,7 +261,9 @@ namespace MVVMApplication.Model
                             $"[{nameof(Order.TypePayment)}] = @TypePayment " +                            
                             $"WHERE [{nameof(Order.Id)}] = @OrderId";
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(query, (cmd) =>
+            return ExecuteSqlNonReaderQuery(
+                query, 
+                (cmd) =>
             {
                 cmd.Parameters.AddWithValue("@CClient", order.CClient);
                 cmd.Parameters.AddWithValue("@DateOrder", order.DateOrder);
@@ -242,7 +283,9 @@ namespace MVVMApplication.Model
                             $"[{nameof(Article.OriginCountry)}] = @OriginCountry " +
                             $"WHERE [{nameof(Article.Id)}] = @ArticleId";
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(query, (cmd) =>
+            return ExecuteSqlNonReaderQuery(
+                query, 
+                (cmd) =>
             {
                 cmd.Parameters.AddWithValue("@Section", article.Section);
                 cmd.Parameters.AddWithValue("@ArticleName", article.ArticleName);
@@ -256,8 +299,56 @@ namespace MVVMApplication.Model
         }
         #endregion
 
+        #region Delete Methods
+        public int DeleteClient(int clientId)
+        {
+            string query = $"DELETE FROM [{nameof(Client)}] " +                            
+                            $"WHERE [{nameof(Client.Id)}] = @ClientId";
+            // Use of params to avoid SQL Injection
+            return ExecuteSqlNonReaderQuery(
+                query, 
+                (cmd) =>
+            {                
+                cmd.Parameters.AddWithValue("@ClientId", clientId);
+
+                return cmd.ExecuteNonQuery();
+            });
+        }
+        public int DeleteOrder(int orderId)
+        {
+            string query = $"DELETE FROM [{nameof(Order)}] " +                            
+                            $"WHERE [{nameof(Order.Id)}] = @OrderId";
+            // Use of params to avoid SQL Injection
+            return ExecuteSqlNonReaderQuery(
+                query, 
+                (cmd) =>
+            {                
+                cmd.Parameters.AddWithValue("@OrderId", orderId);
+
+                return cmd.ExecuteNonQuery();
+            });
+        }
+        public int DeleteArticle(int articleId)
+        {
+            string query = $"DELETE FROM [{nameof(Article)}] " +                            
+                            $"WHERE [{nameof(Article.Id)}] = @ArticleId";
+            // Use of params to avoid SQL Injection
+            return ExecuteSqlNonReaderQuery(
+                query, 
+                (cmd) =>
+            {                
+                cmd.Parameters.AddWithValue("@ArticleId", articleId);
+
+                return cmd.ExecuteNonQuery();
+            });
+        }
+        #endregion
+
         #region Queries Methods
-        private ObservableCollection<T> ExecuteSqlReaderQuery<T>(string query, Func<SqlDataReader, T> mapper)
+        private ObservableCollection<T> ExecuteSqlReaderQuery<T>(
+            string query, 
+            Action<SqlCommand>? parameterize, 
+            Func<SqlDataReader, T> mapper)
         {
             var lista = new ObservableCollection<T>();
 
@@ -265,16 +356,20 @@ namespace MVVMApplication.Model
             {
                 using (var conn = new SqlConnection(connectionString))
                 {
-                    conn.Open();                    
+                    conn.Open();
 
-                    using (var cmd = new SqlCommand(query, conn))                    
-                    using (var reader = cmd.ExecuteReader())
+                    using (var cmd = new SqlCommand(query, conn))
                     {
-                        while (reader.Read())
+                        parameterize?.Invoke(cmd);
+
+                        using (var reader = cmd.ExecuteReader())
                         {
-                            lista.Add(mapper(reader));
+                            while (reader.Read())
+                            {
+                                lista.Add(mapper(reader));
+                            }
                         }
-                    }                    
+                    }
                 }             
             }
             catch (SqlException ex)
@@ -308,6 +403,30 @@ namespace MVVMApplication.Model
             }
 
             return rowsAffected;
+        }
+        private T ExecuteSqlScalarQuery<T>(string query, Func<SqlCommand,T> mapper)
+        {
+            T queryResult = default(T); // <-- init with a def. value
+
+            try
+            {
+                using (var conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();                    
+
+                    using (var cmd = new SqlCommand(query, conn))                                        
+                    {                       
+                        queryResult = mapper(cmd);
+                    }                    
+                }             
+            }
+            catch (SqlException ex)
+            {
+                Debug.WriteLine("Error en la consulta SQL: " + ex.Message,
+                    "Error de base de datos");                
+            }
+
+            return queryResult;
         }
         #endregion
     }

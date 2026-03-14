@@ -93,6 +93,29 @@ namespace MVVMApplication.ViewModel
         }
         #endregion 
 
+        #region Get Commands
+        public ICommand GetAllClientsCommand { get; }
+        public ICommand GetAllOrdersCommand { get; }
+        public ICommand GetAllArticlesCommand { get; }
+        #endregion
+        #region Insert Commands
+        public ICommand InsertClientCommand { get; }
+        public ICommand InsertOrderCommand { get; }
+        public ICommand InsertArticleCommand { get; }
+        #endregion
+
+        #region Update Commands
+        public ICommand UpdateClientCommand { get; }
+        public ICommand UpdateOrderCommand { get; }
+        public ICommand UpdateArticleCommand { get; }
+        #endregion
+
+        #region Delete Commands
+        public ICommand DeleteClientCommand { get; }
+        public ICommand DeleteOrderCommand { get; }
+        public ICommand DeleteArticleCommand { get; }
+        #endregion
+
         public MainWindowViewModel()
         {
             _dbRepository = new DBManager();
@@ -110,6 +133,10 @@ namespace MVVMApplication.ViewModel
             UpdateOrderCommand = new RelayCommand(UpdateOrder, canUpdateOrder);
             UpdateArticleCommand = new RelayCommand(UpdateArticle, canUpdateArticle);
 
+            DeleteClientCommand = new RelayCommand(DeleteClient, canDeleteClient);
+            DeleteOrderCommand = new RelayCommand(DeleteOrder, canDeleteOrder);
+            DeleteArticleCommand = new RelayCommand(DeleteArticle, canDeleteArticle);
+
             // Create instances of every collection
             Clients = new ObservableCollection<Client>();
             Orders = new ObservableCollection<Order>();
@@ -120,22 +147,7 @@ namespace MVVMApplication.ViewModel
             NewArticle = new Article();
         }
 
-        #region Get Commands
-        public ICommand GetAllClientsCommand { get; }        
-        public ICommand GetAllOrdersCommand { get; }        
-        public ICommand GetAllArticlesCommand { get; }
-        #endregion
-        #region Insert Commands
-        public ICommand InsertClientCommand { get; }
-        public ICommand InsertOrderCommand { get; }
-        public ICommand InsertArticleCommand { get; }
-        #endregion
-
-        #region Update Commands
-        public ICommand UpdateClientCommand { get; }
-        public ICommand UpdateOrderCommand { get; }
-        public ICommand UpdateArticleCommand { get; }
-        #endregion
+        
 
         #region Checking Methods
         private int FindClientByName(Client client) => _dbRepository.FindClientByName(client);
@@ -178,7 +190,10 @@ namespace MVVMApplication.ViewModel
         {
             var tempClients = _dbRepository.GetAllClients();
 
-            Clients.Clear();
+            Clients.Clear();                                    // Doing this instead of replacing the ref. with a new one
+                                                                // Otherwise this will break the bindings with the UI and therefore
+                                                                // the autom. updates!!
+                                        
             foreach(var c in tempClients)
                 Clients.Add(c);
         }
@@ -369,7 +384,7 @@ namespace MVVMApplication.ViewModel
                 return;
             }
             else
-                MessageBox.Show($"The Selected client was properly updtated on the DB.");
+                MessageBox.Show($"The Selected client was properly updtated from the DB.");
         }
         private void UpdateOrder(object? parameter)
         {
@@ -422,7 +437,7 @@ namespace MVVMApplication.ViewModel
                 return;
             }
             else
-                MessageBox.Show($"The Selected Order was properly updtated on the DB.");
+                MessageBox.Show($"The Selected Order was properly updtated from the DB.");
         }
         private void UpdateArticle(object? parameter)
         {
@@ -474,7 +489,7 @@ namespace MVVMApplication.ViewModel
                 return;
             }
             else
-                MessageBox.Show($"The Selected Article was properly updtated on the DB.");
+                MessageBox.Show($"The Selected Article was properly updtated from the DB.");
         }
 
         private bool canUpdateClient(object? obj)
@@ -491,8 +506,143 @@ namespace MVVMApplication.ViewModel
         }
         #endregion
         #region Delete Methods
+        private void DeleteClient(object? parameter)
+        {
+            // User Confirmation
+            if (MessageBox.Show(
+                "Are you sure you want to delete the selected Client data?",
+                "Deletion client data confirmation",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question
+                ) == MessageBoxResult.No)
+            {                
+                return;
+            }
 
+            // Data validation
+            if (SelectedClient == null)
+            {
+                MessageBox.Show($"Client data is missing");             
+                return;
+            }
+
+            // Associated Orders validation            
+            if (_dbRepository.ClientHasOrders(SelectedClient.Id))
+            {
+                if (MessageBox.Show(
+                "The selected Client has some orders associated to him/her. " +
+                "To delete the customer, you'll first need to delete all their " +
+                "associated orders. Are you sure you want to continue?",
+                "Deletion asssociated orders data confirmation",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question
+                ) == MessageBoxResult.No)
+                {
+                    GetAllClients(null);
+                    return;
+                }                
+            }
+
+            // DB consult (Once The Selected Client has no associated orders anymore)
+            if (_dbRepository.DeleteClient(SelectedClient.Id) == 0)
+            {
+                MessageBox.Show($"The client data cannot be deleted because there is no client " +
+                                $"with the ID you entered .\n" +
+                                $"Please select an exising Client and try again.");
+                GetAllClients(null);
+                GetAllOrders(null);
+            }
+            else
+            {
+                MessageBox.Show($"The Selected client was properly deleted from the DB.");
+                GetAllClients(null);
+                GetAllOrders(null);
+            }
+        }
+        private void DeleteOrder(object? parameter)
+        {
+            // User Confirmation
+            if (MessageBox.Show(
+                "Are you sure you want to delete the selected Order data?",
+                "Deletion Order data confirmation",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question
+                ) == MessageBoxResult.No)
+            {
+                GetAllOrders(null);
+                return;
+            }
+
+            // Data validation
+            if (SelectedOrder == null)
+            {
+                MessageBox.Show($"Order data is missing");
+                GetAllOrders(null);
+                return;
+            }
+
+            // DB consult
+            if (_dbRepository.DeleteOrder(SelectedOrder.Id) == 0)
+            {
+                MessageBox.Show($"The Order data cannot be deleted because there is no Order " +
+                                $"with the ID you entered .\n" +
+                                $"Please select an exising Order and try again.");
+                GetAllOrders(null);                
+            }
+            else
+            {
+                MessageBox.Show($"The Selected Order was properly deleted from the DB.");
+                GetAllOrders(null);
+            }                
+        }
+        private void DeleteArticle(object? parameter)
+        {
+            // User Confirmation
+            if (MessageBox.Show(
+                "Are you sure you want to delete the selected Article data?",
+                "Deletion Article data confirmation",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question
+                ) == MessageBoxResult.No)
+            {
+                GetAllArticles(null);
+                return;
+            }
+
+            // Data validation
+            if (SelectedArticle == null)
+            {
+                MessageBox.Show($"Article data is missing");
+                GetAllArticles(null);
+                return;
+            }
+
+            // DB consult
+            if (_dbRepository.DeleteArticle(SelectedArticle.Id) == 0)
+            {
+                MessageBox.Show($"The Article data cannot be deleted because there is no Article " +
+                                $"with the ID you entered .\n" +
+                                $"Please select an exising Article and try again.");
+                GetAllArticles(null);               
+            }
+            else
+            {
+                MessageBox.Show($"The Selected Article was properly deleted from the DB.");
+                GetAllArticles(null);
+            }                
+        }
+        private bool canDeleteClient(object? obj)
+        {
+            return (SelectedClient != null && AreClientFieldsFilled(SelectedClient));
+        }
+        private bool canDeleteOrder(object? obj)
+        {
+            return (SelectedOrder != null && AreOrderFieldsFilled(SelectedOrder));
+        }
+        private bool canDeleteArticle(object? obj)
+        {
+            return (SelectedArticle != null && AreArticleFieldsFilled(SelectedArticle));
+        }
         #endregion
-
     }
 }

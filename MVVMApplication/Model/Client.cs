@@ -12,10 +12,6 @@ namespace MVVMApplication.Model
         public string? ClientName { get; set; }
         public string? Address { get; set; }
         public string? Location { get; set; }
-        public string? Telephone { get; set; }
-
-        public override string ToString() => 
-            $"Client: {ClientName}, Address: {Address}, " +
-            $"Location: {Location}, Telephone: {Telephone}";                   
+        public string? Telephone { get; set; }                  
     }
 }
