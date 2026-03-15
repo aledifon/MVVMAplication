@@ -1,4 +1,5 @@
-﻿using MVVMApplication.ViewModel;
+﻿using MVVMApplication.MVVM;
+using MVVMApplication.ViewModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -58,6 +59,37 @@ namespace MVVMApplication
             vm.SelectedClient = null;
             vm.SelectedOrder = null;
             vm.SelectedArticle = null;
+        }
+        private void NewClientTextChanged(object sender, TextChangedEventArgs e)
+        {
+            var vm = DataContext as MainWindowViewModel;            
+            if (vm != null)
+                ((AsyncRelayCommand)vm.InsertClientCommand).   // Force to reevaluate canExecute
+                    RaiseCanExecuteChanged();
+        }
+        private void NewOrderTextChanged(object sender, TextChangedEventArgs e)
+        {
+            var vm = DataContext as MainWindowViewModel;
+            if (vm != null)
+                ((AsyncRelayCommand)vm.InsertOrderCommand).   // Force to reevaluate canExecute
+                    RaiseCanExecuteChanged();
+        }
+        private void NewOrderDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var vm = DataContext as MainWindowViewModel;
+            ((AsyncRelayCommand)vm.InsertOrderCommand).RaiseCanExecuteChanged();
+        }
+        private void NewArticleTextChanged(object sender, TextChangedEventArgs e)
+        {
+            var vm = DataContext as MainWindowViewModel;
+            if (vm != null)
+                ((AsyncRelayCommand)vm.InsertArticleCommand).   // Force to reevaluate canExecute
+                    RaiseCanExecuteChanged();
+        }
+        private void NewArticleDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var vm = DataContext as MainWindowViewModel;
+            ((AsyncRelayCommand)vm.InsertArticleCommand).RaiseCanExecuteChanged();
         }
     }
 }

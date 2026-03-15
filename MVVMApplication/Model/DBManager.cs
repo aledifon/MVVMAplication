@@ -27,60 +27,60 @@ namespace MVVMApplication.Model
         // GetAllArticlesByPriceRange(PriceRange)
 
         #region Check Methods
-        public int FindClientByName(Client client)
+        public async Task<int> FindClientByNameAsync(Client client)
         {
             string query = "SELECT COUNT(*) " +
                             $"FROM [{nameof(Client)}] " +
                             $"WHERE [{nameof(Client.ClientName)}] = @ClientName";            
             // Use of params to avoid SQL Injection
-            return ExecuteSqlScalarQuery(
+            return await ExecuteSqlScalarQueryAsync(
                 query, 
-                (cmd) =>
+                async (cmd) =>
             {
-                cmd.Parameters.AddWithValue("@ClientName", client.ClientName);                
-                return (int)cmd.ExecuteScalar();
+                cmd.Parameters.AddWithValue("@ClientName", client.ClientName);
+                return Convert.ToInt32(await cmd.ExecuteScalarAsync());
             });
         }
-        public int FindArticleByName(Article article)
+        public async Task<int> FindArticleByNameAsync(Article article)
         {
             string query = "SELECT COUNT(*) " +
                             $"FROM [{nameof(Article)}] " +
                             $"WHERE [{nameof(Article.ArticleName)}] = @ArticleName";            
             // Use of params to avoid SQL Injection
-            return ExecuteSqlScalarQuery(
+            return await ExecuteSqlScalarQueryAsync(
                 query, 
-                (cmd) =>
+                async cmd =>
             {
-                cmd.Parameters.AddWithValue("@ArticleName", article.ArticleName);                
-                return (int)cmd.ExecuteScalar();
+                cmd.Parameters.AddWithValue("@ArticleName", article.ArticleName);
+                return Convert.ToInt32(await cmd.ExecuteScalarAsync());
             });
         }
-        public int FindClientByOrderId(int clientId)
+        public async Task<int> FindClientByOrderIdAsync(int clientId)
         {
             string query = "SELECT COUNT(*) " +
                             $"FROM [{nameof(Client)}] " +
                             $"WHERE [{nameof(Client.Id)}] = @CClient";            
             // Use of params to avoid SQL Injection
-            return ExecuteSqlScalarQuery(
+            return await ExecuteSqlScalarQueryAsync(
                 query, 
-                (cmd) =>
+                async cmd =>
             {
                 cmd.Parameters.AddWithValue("@CClient", clientId);                
-                return (int)cmd.ExecuteScalar();
+                return Convert.ToInt32(await cmd.ExecuteScalarAsync());
             });
         }
-        public bool ClientHasOrders(int clientId)
+        public async Task<bool> ClientHasOrdersAsync(int clientId)
         {                         
             string query = "SELECT COUNT(*) " +
                             $"FROM [{nameof(Order)}] " +
                             $"WHERE [{nameof(Order.CClient)}] = @IdClient";
 
-            int count = ExecuteSqlScalarQuery(
+            int count = await ExecuteSqlScalarQueryAsync(
                 query, 
-                cmd => 
+                async cmd => 
                 {
                     cmd.Parameters.AddWithValue("@IdClient", clientId);
-                    return (int)cmd.ExecuteScalar(); 
+                    return Convert.ToInt32(await cmd.ExecuteScalarAsync()); 
                 });
 
             return count > 0;
@@ -88,44 +88,44 @@ namespace MVVMApplication.Model
         #endregion
 
         #region Create Methods
-        public int AddClient(Client? client)
+        public async Task<int> AddClientAsync(Client? client)
         {
             string query = $"INSERT INTO [{nameof(Client)}]" +
                            $"([{nameof(Client.ClientName)}], [{nameof(Client.Address)}], " +
                            $"[{nameof(Client.Location)}] , [{nameof(Client.Telephone)}])" +
                            $"VALUES (@ClientName, @Address, @Location, @Telephone)";   
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(
+            return await ExecuteSqlNonReaderQueryAsync(
                 query,                 
-                cmd =>
+                async cmd =>
             {
                 cmd.Parameters.AddWithValue("@ClientName", client.ClientName);
                 cmd.Parameters.AddWithValue("@Address", client.Address);
                 cmd.Parameters.AddWithValue("@Location", client.Location);
                 cmd.Parameters.AddWithValue("@Telephone", client.Telephone);
 
-                return cmd.ExecuteNonQuery(); 
+                return await cmd.ExecuteNonQueryAsync(); 
             });
         }
-        public int AddOrder(Order? order)
+        public async Task<int> AddOrderAsync(Order? order)
         {
             string query = $"INSERT INTO [{nameof(Order)}]" +
                            $"([{nameof(Order.CClient)}], [{nameof(Order.DateOrder)}], " +
                            $"[{nameof(Order.TypePayment)}])" +
                            $"VALUES (@CClient, @DateOrder, @TypePayment)";
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(
+            return await ExecuteSqlNonReaderQueryAsync(
                 query, 
-                (cmd) =>
+                async cmd =>
             {
                 cmd.Parameters.AddWithValue("@CClient", order.CClient);
                 cmd.Parameters.AddWithValue("@DateOrder", order.DateOrder);
                 cmd.Parameters.AddWithValue("@TypePayment", order.TypePayment);                
 
-                return cmd.ExecuteNonQuery(); 
+                return await cmd.ExecuteNonQueryAsync(); 
             });
         }
-        public int AddArticle(Article? article)
+        public async Task<int> AddArticleAsync(Article? article)
         {
             string query = $"INSERT INTO [{nameof(Article)}]" +
                            $"([{nameof(Article.Section)}], [{nameof(Article.ArticleName)}], " +
@@ -133,9 +133,9 @@ namespace MVVMApplication.Model
                            $"[{nameof(Article.OriginCountry)}])" +
                            $"VALUES (@Section, @ArticleName, @Price, @Date, @OriginCountry)";
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(
+            return await ExecuteSqlNonReaderQueryAsync(
                 query, 
-                (cmd) =>
+                async cmd =>
             {
                 cmd.Parameters.AddWithValue("@Section", article.Section);
                 cmd.Parameters.AddWithValue("@ArticleName", article.ArticleName);
@@ -143,7 +143,7 @@ namespace MVVMApplication.Model
                 cmd.Parameters.AddWithValue("@Date", article.Date);
                 cmd.Parameters.AddWithValue("@OriginCountry", article.OriginCountry);
 
-                return cmd.ExecuteNonQuery(); 
+                return await cmd.ExecuteNonQueryAsync(); 
             });
         }
         #endregion
@@ -176,10 +176,10 @@ namespace MVVMApplication.Model
                                             : reader[nameof(Client.Telephone)].ToString()
             });                        
         }
-        public ObservableCollection<Order> GetAllOrders()
+        public async Task<ObservableCollection<Order>> GetAllOrdersAsync()
         {
             string query = "SELECT * FROM [" + nameof(Order) + "]";
-            return ExecuteSqlReaderQueryAsync(
+            return await ExecuteSqlReaderQueryAsync(
                 query,
                 null,
                 reader => new Order
@@ -197,10 +197,10 @@ namespace MVVMApplication.Model
                                                 : reader[nameof(Order.TypePayment)].ToString()
             });            
         }
-        public ObservableCollection<Article> GetAllArticles()
+        public async Task<ObservableCollection<Article>> GetAllArticlesAsync()
         {
             string query = "SELECT * FROM [" + nameof(Article) + "]";
-            return ExecuteSqlReaderQueryAsync(
+            return await ExecuteSqlReaderQueryAsync(
                 query,
                 null,
                 reader => new Article
@@ -231,7 +231,7 @@ namespace MVVMApplication.Model
         #endregion
 
         #region Update Methods
-        public bool UpdateClient(Client? client)
+        public async Task<bool> UpdateClientAsync(Client? client)
         {
             string query = $"UPDATE [{nameof(Client)}] " +
                             $"SET [{nameof(Client.ClientName)}] = @ClientName, " +
@@ -240,9 +240,9 @@ namespace MVVMApplication.Model
                             $"[{nameof(Client.Telephone)}] = @Telephone " +
                             $"WHERE [{nameof(Client.Id)}] = @ClientId";
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(
+            return await ExecuteSqlNonReaderQueryAsync(
                 query, 
-                (cmd) =>
+                async cmd =>
             {
                 cmd.Parameters.AddWithValue("@ClientName", client.ClientName);
                 cmd.Parameters.AddWithValue("@Address", client.Address);
@@ -250,10 +250,10 @@ namespace MVVMApplication.Model
                 cmd.Parameters.AddWithValue("@Telephone", client.Telephone);
                 cmd.Parameters.AddWithValue("@ClientId", client.Id);
 
-                return cmd.ExecuteNonQuery();
+                return await cmd.ExecuteNonQueryAsync();
             }) == 1;
         }
-        public bool UpdateOrder(Order? order)
+        public async Task<bool> UpdateOrderAsync(Order? order)
         {
             string query = $"UPDATE [{nameof(Order)}] " +
                             $"SET [{nameof(Order.CClient)}] = @CClient, " +
@@ -261,19 +261,19 @@ namespace MVVMApplication.Model
                             $"[{nameof(Order.TypePayment)}] = @TypePayment " +                            
                             $"WHERE [{nameof(Order.Id)}] = @OrderId";
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(
+            return await ExecuteSqlNonReaderQueryAsync(
                 query, 
-                (cmd) =>
+                async cmd =>
             {
                 cmd.Parameters.AddWithValue("@CClient", order.CClient);
                 cmd.Parameters.AddWithValue("@DateOrder", order.DateOrder);
                 cmd.Parameters.AddWithValue("@TypePayment", order.TypePayment);                
                 cmd.Parameters.AddWithValue("@OrderId", order.Id);
 
-                return cmd.ExecuteNonQuery();
+                return await cmd.ExecuteNonQueryAsync();
             }) == 1;
         }
-        public bool UpdateArticle(Article? article)
+        public async Task<bool> UpdateArticleAsync(Article? article)
         {
             string query = $"UPDATE [{nameof(Article)}] " +
                             $"SET [{nameof(Article.Section)}] = @Section ," +
@@ -283,9 +283,9 @@ namespace MVVMApplication.Model
                             $"[{nameof(Article.OriginCountry)}] = @OriginCountry " +
                             $"WHERE [{nameof(Article.Id)}] = @ArticleId";
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(
+            return await ExecuteSqlNonReaderQueryAsync(
                 query, 
-                (cmd) =>
+                async cmd =>
             {
                 cmd.Parameters.AddWithValue("@Section", article.Section);
                 cmd.Parameters.AddWithValue("@ArticleName", article.ArticleName);
@@ -294,52 +294,52 @@ namespace MVVMApplication.Model
                 cmd.Parameters.AddWithValue("@OriginCountry", article.OriginCountry);
                 cmd.Parameters.AddWithValue("@ArticleId", article.Id);
 
-                return cmd.ExecuteNonQuery();
+                return await cmd.ExecuteNonQueryAsync();
             }) == 1;
         }
         #endregion
 
         #region Delete Methods
-        public int DeleteClient(int clientId)
+        public async Task<int> DeleteClientAsync(int clientId)
         {
             string query = $"DELETE FROM [{nameof(Client)}] " +                            
                             $"WHERE [{nameof(Client.Id)}] = @ClientId";
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(
+            return await ExecuteSqlNonReaderQueryAsync(
                 query, 
-                (cmd) =>
+                async cmd =>
             {                
                 cmd.Parameters.AddWithValue("@ClientId", clientId);
 
-                return cmd.ExecuteNonQuery();
+                return await cmd.ExecuteNonQueryAsync();
             });
         }
-        public int DeleteOrder(int orderId)
+        public async Task<int> DeleteOrderAsync(int orderId)
         {
             string query = $"DELETE FROM [{nameof(Order)}] " +                            
                             $"WHERE [{nameof(Order.Id)}] = @OrderId";
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(
-                query, 
-                (cmd) =>
+            return await ExecuteSqlNonReaderQueryAsync(
+                query,
+                async cmd =>
             {                
                 cmd.Parameters.AddWithValue("@OrderId", orderId);
 
-                return cmd.ExecuteNonQuery();
+                return await cmd.ExecuteNonQueryAsync();
             });
         }
-        public int DeleteArticle(int articleId)
+        public async Task<int> DeleteArticleAsync(int articleId)
         {
             string query = $"DELETE FROM [{nameof(Article)}] " +                            
                             $"WHERE [{nameof(Article.Id)}] = @ArticleId";
             // Use of params to avoid SQL Injection
-            return ExecuteSqlNonReaderQuery(
-                query, 
-                (cmd) =>
+            return await ExecuteSqlNonReaderQueryAsync(
+                query,
+                async cmd =>
             {                
                 cmd.Parameters.AddWithValue("@ArticleId", articleId);
 
-                return cmd.ExecuteNonQuery();
+                return await cmd.ExecuteNonQueryAsync();
             });
         }
         #endregion
@@ -380,7 +380,7 @@ namespace MVVMApplication.Model
 
             return lista;
         }
-        private int ExecuteSqlNonReaderQuery(string query, Func<SqlCommand,int> mapper)
+        private async Task<int> ExecuteSqlNonReaderQueryAsync(string query, Func<SqlCommand, Task<int>> mapper)
         {
             int rowsAffected = -1;
 
@@ -388,11 +388,11 @@ namespace MVVMApplication.Model
             {
                 using (var conn = new SqlConnection(connectionString))
                 {
-                    conn.Open();                    
+                    await conn.OpenAsync();                    
 
                     using (var cmd = new SqlCommand(query, conn))                                        
                     {                       
-                        rowsAffected = mapper(cmd);
+                        rowsAffected = await mapper(cmd);
                     }                    
                 }             
             }
@@ -404,19 +404,19 @@ namespace MVVMApplication.Model
 
             return rowsAffected;
         }
-        private T ExecuteSqlScalarQuery<T>(string query, Func<SqlCommand,T> mapper)
+        private async Task<T?> ExecuteSqlScalarQueryAsync<T>(string query, Func<SqlCommand,Task<T>> mapper)
         {
-            T queryResult = default(T); // <-- init with a def. value
+            T? queryResult = default; // <-- init with a def. value
 
             try
             {
                 using (var conn = new SqlConnection(connectionString))
                 {
-                    conn.Open();                    
+                    await conn.OpenAsync();                    
 
                     using (var cmd = new SqlCommand(query, conn))                                        
                     {                       
-                        queryResult = mapper(cmd);
+                        queryResult = await mapper(cmd);
                     }                    
                 }             
             }

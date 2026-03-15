@@ -176,13 +176,17 @@
                     </StackPanel>
                     <StackPanel Grid.Row="1">
                         <Label Content="Client Name"/>
-                        <TextBox Margin="5,0,5,0" Text="{Binding NewClient.ClientName, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewClient.ClientName, UpdateSourceTrigger=PropertyChanged}" 
+                                 TextChanged="NewClientTextChanged"/>
                         <Label Content="Address"/>
-                        <TextBox Margin="5,0,5,0" Text="{Binding NewClient.Address, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewClient.Address, UpdateSourceTrigger=PropertyChanged}" 
+                                 TextChanged="NewClientTextChanged"/>
                         <Label Content="Location"/>
-                        <TextBox Margin="5,0,5,0" Text="{Binding NewClient.Location, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewClient.Location, UpdateSourceTrigger=PropertyChanged}"
+                                 TextChanged="NewClientTextChanged"/>
                         <Label Content="Telephone"/>
-                        <TextBox Margin="5,0,5,0" Text="{Binding NewClient.Telephone, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewClient.Telephone, UpdateSourceTrigger=PropertyChanged}"
+                                 TextChanged="NewClientTextChanged"/>
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Row="1">
@@ -197,11 +201,14 @@
                     </StackPanel>
                     <StackPanel Grid.Row="1">
                         <Label Content="C-client"/>
-                        <TextBox Margin="5,0,5,0" Text="{Binding NewOrder.CClient, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewOrder.CClient, UpdateSourceTrigger=PropertyChanged}"
+                                 TextChanged="NewOrderTextChanged"/>
                         <Label Content="Date order"/>
-                        <DatePicker  Margin="5,0,5,0" SelectedDate="{Binding NewOrder.DateOrder, UpdateSourceTrigger=PropertyChanged}"/>
+                        <DatePicker  Margin="5,0,5,0" SelectedDate="{Binding NewOrder.DateOrder, UpdateSourceTrigger=PropertyChanged}"
+                                     SelectedDateChanged="NewOrderDateChanged"/>
                         <Label Content="Type of payment"/>
-                        <TextBox Margin="5,0,5,0" Text="{Binding NewOrder.TypePayment, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewOrder.TypePayment, UpdateSourceTrigger=PropertyChanged}"
+                                 TextChanged="NewOrderTextChanged"/>
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Row="2">
@@ -216,15 +223,20 @@
                     </StackPanel>
                     <StackPanel Grid.Row="1">
                         <Label Content="Section"/>
-                        <TextBox Margin="5,0,5,0" Text="{Binding NewArticle.Section, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewArticle.Section, UpdateSourceTrigger=PropertyChanged}"
+                                 TextChanged="NewArticleTextChanged"/>
                         <Label Content="Article Name"/>
-                        <TextBox Margin="5,0,5,0" Text="{Binding NewArticle.ArticleName, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewArticle.ArticleName, UpdateSourceTrigger=PropertyChanged}"
+                                 TextChanged="NewArticleTextChanged"/>
                         <Label Content="Price"/>
-                        <TextBox Margin="5,0,5,0" Text="{Binding NewArticle.Price, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewArticle.Price, UpdateSourceTrigger=PropertyChanged}"
+                                 TextChanged="NewArticleTextChanged"/>
                         <Label Content="Date"/>
-                        <DatePicker  Margin="5,0,5,0" SelectedDate="{Binding NewArticle.Date, UpdateSourceTrigger=PropertyChanged}"/>
+                        <DatePicker  Margin="5,0,5,0" SelectedDate="{Binding NewArticle.Date, UpdateSourceTrigger=PropertyChanged}"
+                                     SelectedDateChanged="NewArticleDateChanged"/>
                         <Label Content="Origin Country"/>
-                        <TextBox Margin="5,0,5,0" Text="{Binding NewArticle.OriginCountry, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox Margin="5,0,5,0" Text="{Binding NewArticle.OriginCountry, UpdateSourceTrigger=PropertyChanged}"
+                                 TextChanged="NewArticleTextChanged"/>
                     </StackPanel>
                 </Grid>
             </Grid>

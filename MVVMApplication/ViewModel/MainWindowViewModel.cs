@@ -2,6 +2,7 @@
 using MVVMApplication.MVVM;
 using System.Collections.ObjectModel;
 using System.Net;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -24,9 +25,11 @@ namespace MVVMApplication.ViewModel
             set
             {
                 _selectedClient = value;
-                OnPropertyChanged();        // As we're using the Compiler Attribute CallerMemberName
-                                            // the 'SelectedItem' string will be passed automatically
-                                            // as parameter
+                OnPropertyChanged();
+                ((AsyncRelayCommand)UpdateClientCommand).   // Force to reevaluate canExecute
+                    RaiseCanExecuteChanged();
+                ((AsyncRelayCommand)DeleteClientCommand).   
+                    RaiseCanExecuteChanged();
             }
         }
         private Client? _newClient;
@@ -36,9 +39,7 @@ namespace MVVMApplication.ViewModel
             set
             {
                 _newClient = value;
-                OnPropertyChanged();        // As we're using the Compiler Attribute CallerMemberName
-                                            // the 'SelectedItem' string will be passed automatically
-                                            // as parameter
+                OnPropertyChanged();                        
             }
         }
 
@@ -49,9 +50,11 @@ namespace MVVMApplication.ViewModel
             set
             {
                 _selectedOrder = value;
-                OnPropertyChanged();        // As we're using the Compiler Attribute CallerMemberName
-                                            // the 'SelectedItem' string will be passed automatically
-                                            // as parameter
+                OnPropertyChanged();        
+                ((AsyncRelayCommand)UpdateOrderCommand).   // Force to reevaluate canExecute
+                    RaiseCanExecuteChanged();
+                ((AsyncRelayCommand)DeleteOrderCommand).
+                    RaiseCanExecuteChanged();
             }
         }
         private Order? _newOrder;
@@ -61,9 +64,7 @@ namespace MVVMApplication.ViewModel
             set
             {
                 _newOrder = value;
-                OnPropertyChanged();        // As we're using the Compiler Attribute CallerMemberName
-                                            // the 'SelectedItem' string will be passed automatically
-                                            // as parameter
+                OnPropertyChanged();                        
             }
         }
 
@@ -74,9 +75,11 @@ namespace MVVMApplication.ViewModel
             set
             {
                 _selectedArticle = value;
-                OnPropertyChanged();        // As we're using the Compiler Attribute CallerMemberName
-                                            // the 'SelectedItem' string will be passed automatically
-                                            // as parameter
+                OnPropertyChanged();
+                ((AsyncRelayCommand)UpdateArticleCommand).   // Force to reevaluate canExecute
+                    RaiseCanExecuteChanged();
+                ((AsyncRelayCommand)DeleteArticleCommand).
+                    RaiseCanExecuteChanged();
             }
         }
         private Article? _newArticle;
@@ -86,9 +89,7 @@ namespace MVVMApplication.ViewModel
             set
             {
                 _newArticle = value;
-                OnPropertyChanged();        // As we're using the Compiler Attribute CallerMemberName
-                                            // the 'SelectedItem' string will be passed automatically
-                                            // as parameter
+                OnPropertyChanged();                
             }
         }
         #endregion 
@@ -121,21 +122,21 @@ namespace MVVMApplication.ViewModel
             _dbRepository = new DBManager();
 
             // Create instances of every Command
-            GetAllClientsCommand = new RelayCommand(GetAllClientsAsync);
-            GetAllOrdersCommand = new RelayCommand(GetAllOrders);
-            GetAllArticlesCommand = new RelayCommand(GetAllArticles);
+            GetAllClientsCommand = new AsyncRelayCommand(GetAllClientsAsync);
+            GetAllOrdersCommand = new AsyncRelayCommand(GetAllOrdersAsync);
+            GetAllArticlesCommand = new AsyncRelayCommand(GetAllArticlesAsync);
 
-            InsertClientCommand = new RelayCommand(AddClient, canAddClient);
-            InsertOrderCommand = new RelayCommand(AddOrder, canAddOrder);
-            InsertArticleCommand = new RelayCommand(AddArticle, canAddArticle);
+            InsertClientCommand = new AsyncRelayCommand(AddClientAsync, canAddClient);
+            InsertOrderCommand = new AsyncRelayCommand(AddOrderAsync, canAddOrder);
+            InsertArticleCommand = new AsyncRelayCommand(AddArticleAsync, canAddArticle);
 
-            UpdateClientCommand = new RelayCommand(UpdateClient, canUpdateClient);
-            UpdateOrderCommand = new RelayCommand(UpdateOrder, canUpdateOrder);
-            UpdateArticleCommand = new RelayCommand(UpdateArticle, canUpdateArticle);
+            UpdateClientCommand = new AsyncRelayCommand(UpdateClientAsync, canUpdateClient);
+            UpdateOrderCommand = new AsyncRelayCommand(UpdateOrderAsync, canUpdateOrder);
+            UpdateArticleCommand = new AsyncRelayCommand(UpdateArticleAsync, canUpdateArticle);
 
-            DeleteClientCommand = new RelayCommand(DeleteClient, canDeleteClient);
-            DeleteOrderCommand = new RelayCommand(DeleteOrder, canDeleteOrder);
-            DeleteArticleCommand = new RelayCommand(DeleteArticle, canDeleteArticle);
+            DeleteClientCommand = new AsyncRelayCommand(DeleteClientAsync, canDeleteClient);
+            DeleteOrderCommand = new AsyncRelayCommand(DeleteOrderAsync, canDeleteOrder);
+            DeleteArticleCommand = new AsyncRelayCommand(DeleteArticleAsync, canDeleteArticle);
 
             // Create instances of every collection
             Clients = new ObservableCollection<Client>();
@@ -150,9 +151,9 @@ namespace MVVMApplication.ViewModel
         
 
         #region Checking Methods
-        private int FindClientByName(Client client) => _dbRepository.FindClientByName(client);
-        private int FindArticleByName(Article article) => _dbRepository.FindArticleByName(article);
-        private int FindClientByOrderId(int clientId) => _dbRepository.FindClientByOrderId(clientId);
+        private async Task<int> FindClientByNameAsync(Client client) => await _dbRepository.FindClientByNameAsync(client);
+        private async Task<int> FindArticleByNameAsync(Article article) => await _dbRepository.FindArticleByNameAsync(article);
+        private async Task<int> FindClientByOrderIdAsync(int clientId) => await _dbRepository.FindClientByOrderIdAsync(clientId);
         #endregion
 
         #region Data Validation Methods
@@ -186,7 +187,7 @@ namespace MVVMApplication.ViewModel
         #endregion
 
         #region Read Methods
-        private async void GetAllClientsAsync(object? parameter)
+        private async Task GetAllClientsAsync(object? parameter)
         {
             var tempClients = await _dbRepository.GetAllClientsAsync();
 
@@ -197,17 +198,17 @@ namespace MVVMApplication.ViewModel
             foreach(var c in tempClients)
                 Clients.Add(c);
         }
-        private void GetAllOrders(object? parameter)
+        private async Task GetAllOrdersAsync(object? parameter)
         {           
-            var tempOrders = _dbRepository.GetAllOrders();
+            var tempOrders =  await _dbRepository.GetAllOrdersAsync();
 
             Orders.Clear();
             foreach (var c in tempOrders)
                 Orders.Add(c);
         }
-        private void GetAllArticles(object? parameter)
+        private async Task GetAllArticlesAsync(object? parameter)
         {
-            var tempArticles = _dbRepository.GetAllArticles();
+            var tempArticles = await _dbRepository.GetAllArticlesAsync();
 
             Articles.Clear();
             foreach (var c in tempArticles)
@@ -216,7 +217,7 @@ namespace MVVMApplication.ViewModel
         #endregion
 
         #region Create Methods
-        private void AddClient(object? parameter)
+        private async Task AddClientAsync(object? parameter)
         {
             // Data validation
             if (NewClient == null)
@@ -234,7 +235,7 @@ namespace MVVMApplication.ViewModel
             // Max Length Validation (Optional)
 
             // Duplicates validation
-            else if (FindClientByName(NewClient) > 0)
+            else if (await FindClientByNameAsync(NewClient) > 0)
             {
                 MessageBox.Show($"The inserted Client already exists on the DB.\n" +
                                 $"Please, try with a different Client Name");
@@ -242,15 +243,15 @@ namespace MVVMApplication.ViewModel
             }
 
             // If all previous validations are ok then insert data on the DB
-            if (_dbRepository.AddClient(NewClient) > 0)
+            if (await _dbRepository.AddClientAsync(NewClient) > 0)
             {
                 MessageBox.Show($"The new Client {NewClient.ClientName} was properly added to the DB.");
-                GetAllClientsAsync(null);
+                await GetAllClientsAsync(null);
             }
             else
                 MessageBox.Show($"No new client was added to the DB. Please check with the suport!");
         }        
-        private void AddOrder(object? parameter)
+        private async Task AddOrderAsync(object? parameter)
         {
             // Data validation
             if (NewOrder == null)
@@ -268,7 +269,7 @@ namespace MVVMApplication.ViewModel
             // Max Length Validation (Optional)
 
             // Client Id validation
-            else if (FindClientByOrderId(NewOrder.CClient) != 1)
+            else if (await FindClientByOrderIdAsync(NewOrder.CClient) != 1)
             {
                 MessageBox.Show($"The order cannot be created because there is no client " +
                                 $"with the ID you entered as CClient.\n" +
@@ -277,15 +278,15 @@ namespace MVVMApplication.ViewModel
             }
 
             // If all previous validations are ok then insert data on the DB
-            if (_dbRepository.AddOrder(NewOrder) > 0)
+            if (await _dbRepository.AddOrderAsync(NewOrder) > 0)
             {
                 MessageBox.Show($"The new Order was properly added to the DB.");
-                GetAllOrders(null);
+                await GetAllOrdersAsync(null);
             }
             else
                 MessageBox.Show($"No new order was added to the DB. Please check with the support!");
         }
-        private void AddArticle(object? parameter)
+        private async Task AddArticleAsync(object? parameter)
         {
             // Data validation
             if (NewArticle == null)
@@ -303,7 +304,7 @@ namespace MVVMApplication.ViewModel
             // Max Length Validation (Optional)
 
             // Duplicates validation
-            else if (FindArticleByName(NewArticle) > 0)
+            else if (await FindArticleByNameAsync(NewArticle) > 0)
             {
                 MessageBox.Show($"The inserted Article already exists on the DB.\n" +
                                 $"Please, try with a different Article Name");
@@ -311,10 +312,10 @@ namespace MVVMApplication.ViewModel
             }
 
             // If all previous validations are ok then insert data on the DB
-            if (_dbRepository.AddArticle(NewArticle) > 0)
+            if (await _dbRepository.AddArticleAsync(NewArticle) > 0)
             {
                 MessageBox.Show($"The new Article {NewArticle.ArticleName} was properly added to the DB.");
-                GetAllArticles(null);
+                await GetAllArticlesAsync(null);
             }
             else
                 MessageBox.Show($"No new article was added to the DB. Please check with the support!");
@@ -334,7 +335,7 @@ namespace MVVMApplication.ViewModel
         }
         #endregion
         #region Update Methods
-        private void UpdateClient(object? parameter)
+        private async Task UpdateClientAsync(object? parameter)
         {
             // User Confirmation
             if (MessageBox.Show(
@@ -344,7 +345,7 @@ namespace MVVMApplication.ViewModel
                 MessageBoxImage.Question
                 ) == MessageBoxResult.No)
             {
-                GetAllClientsAsync(null);
+                await GetAllClientsAsync(null);
                 return;
             }                
 
@@ -352,13 +353,13 @@ namespace MVVMApplication.ViewModel
             if (SelectedClient == null)
             {
                 MessageBox.Show($"Client data is missing");
-                GetAllClientsAsync(null);
+                await GetAllClientsAsync(null);
                 return;
             }
             else if (!AreClientFieldsFilled(SelectedClient))
             {
                 MessageBox.Show($"All Client fields are required.");
-                GetAllClientsAsync(null);
+                await GetAllClientsAsync(null);
                 return;
             }
 
@@ -366,27 +367,27 @@ namespace MVVMApplication.ViewModel
             // Max Length Validation (Optional)
 
             // Duplicates validation
-            else if (FindClientByName(SelectedClient) > 1)
+            else if (await FindClientByNameAsync(SelectedClient) > 1)
             {
                 MessageBox.Show($"The inserted Client already exists on the DB.\n" +
                                 $"Please, try with a different Client Name");
-                GetAllClientsAsync(null);
+                await GetAllClientsAsync(null);
                 return;
             }
             
             // DB consult
-            if (!_dbRepository.UpdateClient(SelectedClient))
+            if (!(await _dbRepository.UpdateClientAsync(SelectedClient)))
             {
                 MessageBox.Show($"The client data cannot be updated because there is no client " +
                                 $"with the ID you entered .\n" +
                                 $"Please select an exising Client and try again.");
-                GetAllClientsAsync(null);
+                await GetAllClientsAsync(null);
                 return;
             }
             else
                 MessageBox.Show($"The Selected client was properly updtated from the DB.");
         }
-        private void UpdateOrder(object? parameter)
+        private async Task UpdateOrderAsync(object? parameter)
         {
             // User Confirmation
             if (MessageBox.Show(
@@ -396,7 +397,7 @@ namespace MVVMApplication.ViewModel
                 MessageBoxImage.Question
                 ) == MessageBoxResult.No)
             {
-                GetAllOrders(null);
+                await GetAllOrdersAsync(null);
                 return;
             }
 
@@ -404,13 +405,13 @@ namespace MVVMApplication.ViewModel
             if (SelectedOrder == null)
             {
                 MessageBox.Show($"Order data is missing");
-                GetAllOrders(null);
+                await GetAllOrdersAsync(null);
                 return;
             }
             else if (!AreOrderFieldsFilled(SelectedOrder))
             {
                 MessageBox.Show($"All Order fields are required.");
-                GetAllOrders(null);
+                await GetAllOrdersAsync(null);
                 return;
             }
 
@@ -418,28 +419,28 @@ namespace MVVMApplication.ViewModel
             // Max Length Validation (Optional)
 
             // Client Id validation
-            else if (FindClientByOrderId(SelectedOrder.CClient) != 1)
+            else if (await FindClientByOrderIdAsync(SelectedOrder.CClient) != 1)
             {
                 MessageBox.Show($"The order cannot be updated because there is no client " +
                                 $"with the ID you entered as CClient.\n" +
                                 $"Please select an exising Client ID and try again.");
-                GetAllOrders(null);
+                await GetAllOrdersAsync(null);
                 return;
             }
 
             // DB consult
-            if (!_dbRepository.UpdateOrder(SelectedOrder))
+            if (!(await _dbRepository.UpdateOrderAsync(SelectedOrder)))
             {
                 MessageBox.Show($"The order data cannot be updated because there is no order " +
                                 $"with the ID you entered .\n" +
                                 $"Please select an exising Order and try again.");
-                GetAllOrders(null);
+                await GetAllOrdersAsync(null);
                 return;
             }
             else
                 MessageBox.Show($"The Selected Order was properly updtated from the DB.");
         }
-        private void UpdateArticle(object? parameter)
+        private async Task UpdateArticleAsync(object? parameter)
         {
             // User Confirmation
             if (MessageBox.Show(
@@ -449,7 +450,7 @@ namespace MVVMApplication.ViewModel
                 MessageBoxImage.Question
                 ) == MessageBoxResult.No)
             {
-                GetAllArticles(null);
+                await GetAllArticlesAsync(null);
                 return;
             }
 
@@ -457,13 +458,13 @@ namespace MVVMApplication.ViewModel
             if (SelectedArticle == null)
             {
                 MessageBox.Show($"Article data is missing");
-                GetAllArticles(null);
+                await GetAllArticlesAsync(null);
                 return;
             }
             else if (!AreArticleFieldsFilled(SelectedArticle))
             {
                 MessageBox.Show($"All Article fields are required.");
-                GetAllArticles(null);
+                await GetAllArticlesAsync(null);
                 return;
             }
 
@@ -471,21 +472,21 @@ namespace MVVMApplication.ViewModel
             // Max Length Validation (Optional)
 
             // Duplicates validation
-            else if (FindArticleByName(SelectedArticle) > 1)
+            else if (await FindArticleByNameAsync(SelectedArticle) > 1)
             {
                 MessageBox.Show($"The inserted Article already exists on the DB.\n" +
                                 $"Please, try with a different Article Name");
-                GetAllArticles(null);
+                await GetAllArticlesAsync(null);
                 return;
             }
 
             // DB consult
-            if (!_dbRepository.UpdateArticle(SelectedArticle))
+            if (!(await _dbRepository.UpdateArticleAsync(SelectedArticle)))
             {
                 MessageBox.Show($"The article data cannot be updated because there is no article " +
                                 $"with the ID you entered .\n" +
                                 $"Please, select an exising Article and try again.");
-                GetAllArticles(null);
+                await GetAllArticlesAsync(null);
                 return;
             }
             else
@@ -506,7 +507,7 @@ namespace MVVMApplication.ViewModel
         }
         #endregion
         #region Delete Methods
-        private void DeleteClient(object? parameter)
+        private async Task DeleteClientAsync(object? parameter)
         {
             // User Confirmation
             if (MessageBox.Show(
@@ -527,7 +528,7 @@ namespace MVVMApplication.ViewModel
             }
 
             // Associated Orders validation            
-            if (_dbRepository.ClientHasOrders(SelectedClient.Id))
+            if (await _dbRepository.ClientHasOrdersAsync(SelectedClient.Id))
             {
                 if (MessageBox.Show(
                 "The selected Client has some orders associated to him/her. " +
@@ -538,28 +539,28 @@ namespace MVVMApplication.ViewModel
                 MessageBoxImage.Question
                 ) == MessageBoxResult.No)
                 {
-                    GetAllClientsAsync(null);
+                    await GetAllClientsAsync(null);
                     return;
                 }                
             }
 
             // DB consult (Once The Selected Client has no associated orders anymore)
-            if (_dbRepository.DeleteClient(SelectedClient.Id) == 0)
+            if (await _dbRepository.DeleteClientAsync(SelectedClient.Id) == 0)
             {
                 MessageBox.Show($"The client data cannot be deleted because there is no client " +
                                 $"with the ID you entered .\n" +
                                 $"Please select an exising Client and try again.");
-                GetAllClientsAsync(null);
-                GetAllOrders(null);
+                await GetAllClientsAsync(null);
+                await GetAllOrdersAsync(null);
             }
             else
             {
                 MessageBox.Show($"The Selected client was properly deleted from the DB.");
-                GetAllClientsAsync(null);
-                GetAllOrders(null);
+                await GetAllClientsAsync(null);
+                await GetAllOrdersAsync(null);
             }
         }
-        private void DeleteOrder(object? parameter)
+        private async Task DeleteOrderAsync(object? parameter)
         {
             // User Confirmation
             if (MessageBox.Show(
@@ -569,7 +570,7 @@ namespace MVVMApplication.ViewModel
                 MessageBoxImage.Question
                 ) == MessageBoxResult.No)
             {
-                GetAllOrders(null);
+                await GetAllOrdersAsync(null);
                 return;
             }
 
@@ -577,25 +578,25 @@ namespace MVVMApplication.ViewModel
             if (SelectedOrder == null)
             {
                 MessageBox.Show($"Order data is missing");
-                GetAllOrders(null);
+                await GetAllOrdersAsync(null);
                 return;
             }
 
             // DB consult
-            if (_dbRepository.DeleteOrder(SelectedOrder.Id) == 0)
+            if (await _dbRepository.DeleteOrderAsync(SelectedOrder.Id) == 0)
             {
                 MessageBox.Show($"The Order data cannot be deleted because there is no Order " +
                                 $"with the ID you entered .\n" +
                                 $"Please select an exising Order and try again.");
-                GetAllOrders(null);                
+                await GetAllOrdersAsync(null);                
             }
             else
             {
                 MessageBox.Show($"The Selected Order was properly deleted from the DB.");
-                GetAllOrders(null);
+                await GetAllOrdersAsync(null);
             }                
         }
-        private void DeleteArticle(object? parameter)
+        private async Task DeleteArticleAsync(object? parameter)
         {
             // User Confirmation
             if (MessageBox.Show(
@@ -605,7 +606,7 @@ namespace MVVMApplication.ViewModel
                 MessageBoxImage.Question
                 ) == MessageBoxResult.No)
             {
-                GetAllArticles(null);
+                await GetAllArticlesAsync(null);
                 return;
             }
 
@@ -613,22 +614,22 @@ namespace MVVMApplication.ViewModel
             if (SelectedArticle == null)
             {
                 MessageBox.Show($"Article data is missing");
-                GetAllArticles(null);
+                await GetAllArticlesAsync(null);
                 return;
             }
 
             // DB consult
-            if (_dbRepository.DeleteArticle(SelectedArticle.Id) == 0)
+            if (await _dbRepository.DeleteArticleAsync(SelectedArticle.Id) == 0)
             {
                 MessageBox.Show($"The Article data cannot be deleted because there is no Article " +
                                 $"with the ID you entered .\n" +
                                 $"Please select an exising Article and try again.");
-                GetAllArticles(null);               
+                await GetAllArticlesAsync(null);               
             }
             else
             {
                 MessageBox.Show($"The Selected Article was properly deleted from the DB.");
-                GetAllArticles(null);
+                await GetAllArticlesAsync(null);
             }                
         }
         private bool canDeleteClient(object? obj)
