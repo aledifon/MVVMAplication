@@ -15,7 +15,7 @@ namespace MVVMApplication.Model
     {
         //private string connectionString = "Server=laptopdifon;Database=GestionPedidos;Trusted_Connection=True;";
         private readonly string connectionString = 
-            ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            ConfigurationManager.ConnectionStrings["DefaultConnectionLocalFile"].ConnectionString;
 
         // Methods
         // GetAllClients()
@@ -59,7 +59,7 @@ namespace MVVMApplication.Model
         {
             string query = "SELECT COUNT(*) " +
                             $"FROM [{nameof(Client)}] " +
-                            $"WHERE [{nameof(Client.Id)}] = @CClient";            
+                            $"WHERE [{"ClientId"}] = @CClient";            
             // Use of params to avoid SQL Injection
             return await ExecuteSqlScalarQueryAsync(
                 query, 
@@ -157,7 +157,7 @@ namespace MVVMApplication.Model
                 null,
                 reader => new Client
             {
-                Id = (int)reader[nameof(Client.Id)],
+                Id = (int)reader["ClientId"],
 
                 ClientName = reader[nameof(Client.ClientName)] == DBNull.Value
                                             ? null
@@ -184,7 +184,7 @@ namespace MVVMApplication.Model
                 null,
                 reader => new Order
             {
-                Id = (int)reader[nameof(Order.Id)],
+                Id = (int)reader["OrderId"],
 
                 CClient = (int)reader[nameof(Order.CClient)],
 
@@ -205,7 +205,7 @@ namespace MVVMApplication.Model
                 null,
                 reader => new Article
             {
-                Id = (int)reader[nameof(Article.Id)],
+                Id = (int)reader["ArticleId"],
 
                 Section = reader[nameof(Article.Section)] == DBNull.Value
                                         ? null
@@ -238,7 +238,7 @@ namespace MVVMApplication.Model
                             $"[{nameof(Client.Address)}] = @Address, " +
                             $"[{nameof(Client.Location)}] = @Location, " +
                             $"[{nameof(Client.Telephone)}] = @Telephone " +
-                            $"WHERE [{nameof(Client.Id)}] = @ClientId";
+                            $"WHERE [{"ClientId"}] = @ClientId";
             // Use of params to avoid SQL Injection
             return await ExecuteSqlNonReaderQueryAsync(
                 query, 
@@ -259,7 +259,7 @@ namespace MVVMApplication.Model
                             $"SET [{nameof(Order.CClient)}] = @CClient, " +
                             $"[{nameof(Order.DateOrder)}] = @DateOrder, " +
                             $"[{nameof(Order.TypePayment)}] = @TypePayment " +                            
-                            $"WHERE [{nameof(Order.Id)}] = @OrderId";
+                            $"WHERE [{"OrderId"}] = @OrderId";
             // Use of params to avoid SQL Injection
             return await ExecuteSqlNonReaderQueryAsync(
                 query, 
@@ -281,7 +281,7 @@ namespace MVVMApplication.Model
                             $"[{nameof(Article.Price)}] = @Price ," +
                             $"[{nameof(Article.Date)}] = @Date ," +
                             $"[{nameof(Article.OriginCountry)}] = @OriginCountry " +
-                            $"WHERE [{nameof(Article.Id)}] = @ArticleId";
+                            $"WHERE [{"ArticleId"}] = @ArticleId";
             // Use of params to avoid SQL Injection
             return await ExecuteSqlNonReaderQueryAsync(
                 query, 
@@ -303,7 +303,7 @@ namespace MVVMApplication.Model
         public async Task<int> DeleteClientAsync(int clientId)
         {
             string query = $"DELETE FROM [{nameof(Client)}] " +                            
-                            $"WHERE [{nameof(Client.Id)}] = @ClientId";
+                            $"WHERE [{"ClientId"}] = @ClientId";
             // Use of params to avoid SQL Injection
             return await ExecuteSqlNonReaderQueryAsync(
                 query, 
@@ -317,7 +317,7 @@ namespace MVVMApplication.Model
         public async Task<int> DeleteOrderAsync(int orderId)
         {
             string query = $"DELETE FROM [{nameof(Order)}] " +                            
-                            $"WHERE [{nameof(Order.Id)}] = @OrderId";
+                            $"WHERE [{"OrderId"}] = @OrderId";
             // Use of params to avoid SQL Injection
             return await ExecuteSqlNonReaderQueryAsync(
                 query,
@@ -331,7 +331,7 @@ namespace MVVMApplication.Model
         public async Task<int> DeleteArticleAsync(int articleId)
         {
             string query = $"DELETE FROM [{nameof(Article)}] " +                            
-                            $"WHERE [{nameof(Article.Id)}] = @ArticleId";
+                            $"WHERE [{"ArticleId"}] = @ArticleId";
             // Use of params to avoid SQL Injection
             return await ExecuteSqlNonReaderQueryAsync(
                 query,

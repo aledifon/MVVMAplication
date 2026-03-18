@@ -13,6 +13,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Database\GestionPedidos.mdf" />
+    <None Remove="Database\GestionPedidos_log.ldf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Database\GestionPedidos.mdf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Database\GestionPedidos_log.ldf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="View\" />
   </ItemGroup>
 
